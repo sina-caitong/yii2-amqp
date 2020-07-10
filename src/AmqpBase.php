@@ -65,7 +65,7 @@ class AmqpBase extends Component implements QueueInterface
     /**
      * @event ExecEvent
      */
-    const EVENT_AFTER_ERROR = '_afterError';
+    // const EVENT_AFTER_ERROR = '_afterError';
     /**
      * @event PushEvent
      */
