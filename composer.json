@@ -1,0 +1,20 @@
+{
+    "name": "pzr/amqp",
+    "description": "yii-amqp",
+    "keywords":["yii2", "amqp", "rabbitmq"],
+    "type":"library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "easytoeasy",
+            "email": "easysoeasy@163.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "pzr\\amqp\\": "src"
+        }
+    },
+    "minimum-stability": "stable",
+    "require": {}
+}
