@@ -292,9 +292,10 @@ class AmqpBase extends Component implements QueueInterface
     /**
      * 将待发送数组内的消息发送到AMQP服务器
      *
+     * @param PushEvent $event
      * @return void
      */
-    final public function publishBatch()
+    final public function publishBatch($event)
     {
         $this->channel->set_nack_handler(function (AMQPMessage $payload) {
             $event = new PushEvent([
@@ -310,7 +311,7 @@ class AmqpBase extends Component implements QueueInterface
             $this->trigger(self::EVENT_PUSH_ACK, $event);
         });
 
-        $this->channel->confirm_select();
+        $this->channel->confirm_select($event->noWait);
         $this->channel->publish_batch();
         $this->channel->wait_for_pending_acks();
     }

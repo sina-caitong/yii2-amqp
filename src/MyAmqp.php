@@ -90,8 +90,8 @@ class MyAmqp extends AmqpBase
      * 消息分成一组发送
      *
      * @param array $jobs
-     * @param [type] $exchangeName
-     * @param [type] $routingKey
+     * @param string $exchangeName
+     * @param string $routingKey
      * @return void
      */
     final public function myPublishBatch(array $jobs)
@@ -101,8 +101,8 @@ class MyAmqp extends AmqpBase
             throw new MissPropertyException('jobs is not a array');
         }
 
+        $routingKey = $this->duplicater->getRoutingKey($this->routingKey, $this->duplicate);
         foreach ($jobs as $job) {
-            $routingKey = $this->duplicater->getRoutingKey($this->routingKey, $this->duplicate);
             $this->batchBasicPublish($job, $this->exchangeName, $routingKey);
         }
         $event = new PushEvent([
@@ -111,7 +111,7 @@ class MyAmqp extends AmqpBase
             'routingKey' => $routingKey,
         ]);
         $this->trigger(self::EVENT_BEFORE_PUSH, $event);
-        $this->publishBatch();
+        $this->publishBatch($event);
         $this->trigger(self::EVENT_AFTER_PUSH, $event);
     }
 
