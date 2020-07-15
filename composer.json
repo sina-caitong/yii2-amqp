@@ -1,12 +1,12 @@
 {
     "name": "pzr/amqp",
     "description": "yii-amqp",
-    "keywords":["yii2", "amqp", "rabbitmq"],
+    "keywords":["yii2", "amqp", "rabbitmq", "RPC"],
     "type":"library",
     "license": "MIT",
     "authors": [
         {
-            "name": "easytoeasy",
+            "name": "pengzhengrong",
             "email": "easysoeasy@163.com"
         }
     ],

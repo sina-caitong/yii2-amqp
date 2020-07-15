@@ -65,7 +65,7 @@ class AmqpBase extends Component implements QueueInterface
     /**
      * @event ExecEvent
      */
-    // const EVENT_AFTER_ERROR = '_afterError';
+    const EVENT_AFTER_ERROR = '_afterError';
     /**
      * @event PushEvent
      */
@@ -84,6 +84,7 @@ class AmqpBase extends Component implements QueueInterface
         parent::init();
         $this->serializer = Instance::ensure($this->serializer, SerializerInterface::class);
         Event::on(BaseApp::class, BaseApp::EVENT_AFTER_REQUEST, function () {
+            $this->myLog('========CLOSE Connection=======' . PHP_EOL);
             $this->close();
         });
     }
@@ -98,7 +99,7 @@ class AmqpBase extends Component implements QueueInterface
     /**
      * 队列申明
      *
-     * @param [type] $queueName
+     * @param string $queueName
      * @param array $arguments
      * @return void
      */
@@ -212,7 +213,7 @@ class AmqpBase extends Component implements QueueInterface
         ]);
 
         $this->trigger(self::EVENT_BEFORE_PUSH, $event);
-        $id = $this->pushMessage($event->job, $exchangeName, $routingKey, $event);
+        $id = $this->pushMessage($event->job, $exchangeName, $routingKey, $event->noWait);
         $event->id = $id;
 
         $this->trigger(self::EVENT_AFTER_PUSH, $event);
@@ -228,35 +229,30 @@ class AmqpBase extends Component implements QueueInterface
      * @param string $routingKey
      * @return string
      */
-    final protected function pushMessage($job, $exchangeName, $routingKey, $event)
+    final protected function pushMessage($job, $exchangeName, $routingKey, $noWait = false)
     {
-        $this->myOpen();
+        $this->open();
         $message = $this->serializer->serialize($job);
-        $id = uniqid('', true);
-        $this->channel->set_nack_handler(function (AMQPMessage $payload) use ($exchangeName, $routingKey) {
-            $event = new PushEvent([
-                'job' => $payload->getBody(),
-                'exchangeName' => $exchangeName,
-                'routingKey' => $routingKey,
-            ]);
+
+        $this->channel->set_nack_handler(function (AMQPMessage $payload) {
+            $job = $this->serializer->unserialize($payload->getBody());
+            $event = new PushEvent(['job' => $job]);
             $this->trigger(self::EVENT_PUSH_NACK, $event);
         });
 
-        $this->channel->set_ack_handler(function (AMQPMessage $payload) use ($exchangeName, $routingKey) {
-            $event = new PushEvent([
-                'job' => $payload->getBody(),
-                'exchangeName' => $exchangeName,
-                'routingKey' => $routingKey,
-            ]);
+        $this->channel->set_ack_handler(function (AMQPMessage $payload) {
+            $job = $this->serializer->unserialize($payload->getBody());
+            $event = new PushEvent(['job' => $job]);
             $this->trigger(self::EVENT_PUSH_ACK, $event);
         });
 
-        $this->channel->confirm_select($event->noWait);
+        $this->channel->confirm_select($noWait);
+        $id = uniqid('', true);
         $this->channel->basic_publish(
             new AMQPMessage($message, [
                 'delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT,
                 'message_id' => $id,
-                'priority' => $job->getPriority() ?: 0,
+                'priority' => $job->getPriority(),
             ]),
             $exchangeName,
             $routingKey
@@ -274,7 +270,7 @@ class AmqpBase extends Component implements QueueInterface
      * @param string $routingKey
      * @return void
      */
-    final public function batchBasicPublish($job, $exchangeName, $routingKey)
+    public function batchBasicPublish($job, $exchangeName, $routingKey)
     {
         $id = uniqid('', true);
         $message = $this->serializer->serialize($job);
@@ -295,41 +291,35 @@ class AmqpBase extends Component implements QueueInterface
      * @param PushEvent $event
      * @return void
      */
-    final public function publishBatch($event)
+    public function publishBatch($noWait = false)
     {
         $this->channel->set_nack_handler(function (AMQPMessage $payload) {
-            $event = new PushEvent([
-                'job' => $payload->getBody(),
-            ]);
+            $job = $this->serializer->unserialize($payload->getBody());
+            $event = new PushEvent(['job' => $job]);
             $this->trigger(self::EVENT_PUSH_NACK, $event);
         });
 
         $this->channel->set_ack_handler(function (AMQPMessage $payload) {
-            $event = new PushEvent([
-                'job' => $payload->getBody(),
-            ]);
+            $job = $this->serializer->unserialize($payload->getBody());
+            $event = new PushEvent(['job' => $job]);
             $this->trigger(self::EVENT_PUSH_ACK, $event);
         });
 
-        $this->channel->confirm_select($event->noWait);
+        $this->channel->confirm_select($noWait);
         $this->channel->publish_batch();
         $this->channel->wait_for_pending_acks();
     }
 
-
-
-    
-
     /**
-     * @param $queueName
-     * @param $consumerTag      //消费者的标签
-     * @param $qos              //每个队列最多未被消费的条数
+     * @param string $queueName
+     * @param integer $qos              //每个队列最多未被消费的条数
+     * @param string $consumerTag       //消费者的标签
      */
     public function consume($queueName, $qos = 1, $consumerTag = '')
     {
         $this->open();
-        $callback = function (AMQPMessage $payload) use ($queueName) {
-            $this->handleMessage($payload, $queueName);
+        $callback = function (AMQPMessage $payload) {
+            $this->handleMessage($payload);
         };
 
         /*
@@ -349,28 +339,23 @@ class AmqpBase extends Component implements QueueInterface
      * 处理消息
      *
      * @param AMQPMessage $payload
-     * @param string $queueName
-     * @return bool
+     * @return ExecEvent
      */
-    protected function handleMessage(AMQPMessage $payload, $queueName)
+    public function handleMessage(AMQPMessage $payload)
     {
-        $message = $payload->getBody();
-        $job = $this->serializer->unserialize($message);
+        $job = $this->serializer->unserialize($payload->getBody());
 
-        if (!($job instanceof JobInterface)) {
+        if (!($job instanceof AmqpJob)) {
             return false;
         }
 
-        $event = new ExecEvent([
-            'job' => $job,
-            'queueName' => $queueName,
-        ]);
+        $event = new ExecEvent(['job' => $job]);
 
         $this->trigger(self::EVENT_BEFORE_EXEC, $event);
 
         try {
             $event->result = $event->job->execute();
-            if ($event->result) {
+            if ($event->result !== false) {
                 $this->channel->basic_ack($payload->delivery_info['delivery_tag']);
             } else {
                 $this->channel->basic_nack($payload->delivery_info['delivery_tag']);
@@ -381,7 +366,7 @@ class AmqpBase extends Component implements QueueInterface
             $event->error = $error;
         }
         $this->trigger(self::EVENT_AFTER_EXEC, $event);
-        return true;
+        return $event;
     }
 
     /**
@@ -397,22 +382,6 @@ class AmqpBase extends Component implements QueueInterface
     }
 
     /**
-     * 为了处理生产者消息确认模式，修改代码如：
-     * 
-     * if ($this->next_delivery_tag == 0) //my eidt
-     *    $this->next_delivery_tag = 1;
-     * 
-     */
-    protected function myOpen()
-    {
-        if ($this->channel) {
-            return;
-        }
-        $this->connection = new AMQPConnection($this->host, $this->port, $this->user, $this->password, $this->vhost);
-        $this->channel = $this->connection->channel();
-    }
-
-    /**
      * Opens connection and channel.
      */
     protected function open()
@@ -420,6 +389,7 @@ class AmqpBase extends Component implements QueueInterface
         if ($this->channel) {
             return;
         }
+        $this->myLog('========OPEN Connection========');
         $this->connection = new AMQPStreamConnection($this->host, $this->port, $this->user, $this->password, $this->vhost);
         $this->channel = $this->connection->channel();
     }
@@ -434,6 +404,10 @@ class AmqpBase extends Component implements QueueInterface
         }
         $this->channel->close();
         $this->connection->close();
+    }
+
+    public function myLog($msg) {
+        @error_log(date('Y-m-d H:i:s') . '：' . $msg . PHP_EOL, 3, __DIR__ . '/demo/runtime/logs/test.log');
     }
 
 

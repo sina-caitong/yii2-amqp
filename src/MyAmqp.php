@@ -27,7 +27,8 @@ class MyAmqp extends AmqpBase
      */
     public $duplicater = DuplicateRandom::class;
 
-    public function init() {
+    public function init()
+    {
         parent::init();
         $this->duplicater = Instance::ensure($this->duplicater, DuplicateInterface::class);
     }
@@ -46,7 +47,8 @@ class MyAmqp extends AmqpBase
         }
 
         if ($this->duplicate < 1) {
-            throw new MissPropertyException('The number of queue duplicate must be greater than one');
+            $this->queueDeclare($queueName, $arguments);
+            return;
         }
 
         try {
@@ -66,7 +68,8 @@ class MyAmqp extends AmqpBase
         }
 
         if ($this->duplicate < 1) {
-            throw new MissPropertyException('The number of queue duplicate must be greater than one');
+            $this->queueBind($queueName, $exchangeName, $routingKey, $arguments);
+            return;
         }
 
         /**
@@ -79,7 +82,7 @@ class MyAmqp extends AmqpBase
          */
         try {
             for ($i = 0; $i < $this->duplicate; $i++) {
-                $this->queueBind($queueName . '_' .$i, $exchangeName, $routingKey . '_' . $i, $arguments);
+                $this->queueBind($queueName . '_' . $i, $exchangeName, $routingKey . '_' . $i, $arguments);
             }
         } catch (Exception $e) {
             throw new UnknowException($e->getMessage());
@@ -90,19 +93,25 @@ class MyAmqp extends AmqpBase
      * 消息分成一组发送
      *
      * @param array $jobs
-     * @param string $exchangeName
      * @param string $routingKey
      * @return void
      */
-    final public function myPublishBatch(array $jobs)
+    public function myPublishBatch(array $jobs, $routingKey = '')
     {
-       $this->myOpen();
+        $this->open();
         if (!is_array($jobs)) {
-            throw new MissPropertyException('jobs is not a array');
+            throw new InvalidArgumentException('jobs is not a array');
         }
 
-        $routingKey = $this->duplicater->getRoutingKey($this->routingKey, $this->duplicate);
+        // 放在循环里面是对每一条消息都随机路由，放在循环外则对这一批消息路由
+        if (empty($routingKey)) {
+            $routingKey = $this->routingKey;
+        }
+        $routingKey = $this->duplicater->getRoutingKey($routingKey, $this->duplicate);
         foreach ($jobs as $job) {
+            if (!($job instanceof JobInterface)) {
+                throw new InvalidArgumentException('job is not implatement JobInterface');
+            }
             $this->batchBasicPublish($job, $this->exchangeName, $routingKey);
         }
         $event = new PushEvent([
@@ -111,16 +120,17 @@ class MyAmqp extends AmqpBase
             'routingKey' => $routingKey,
         ]);
         $this->trigger(self::EVENT_BEFORE_PUSH, $event);
-        $this->publishBatch($event);
+        $this->publishBatch($event->noWait);
         $this->trigger(self::EVENT_AFTER_PUSH, $event);
     }
 
     /**
      * @inheritDoc
      */
-    public function push($job, $routingKey='')
+    public function push($job, $routingKey = '')
     {
-        $routingKey = $this->duplicater->getRoutingKey($this->routingKey, $this->duplicate);
+        if (empty($routingKey)) $routingKey = $this->routingKey;
+        $routingKey = $this->duplicater->getRoutingKey($routingKey, $this->duplicate);
         return parent::push($job, $routingKey);
     }
 }
