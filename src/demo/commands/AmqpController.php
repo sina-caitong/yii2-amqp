@@ -5,6 +5,7 @@ namespace app\commands;
 use app\models\CountJob;
 use app\models\RequestJob;
 use pzr\amqp\AmqpBase;
+use pzr\amqp\AmqpJob;
 use pzr\amqp\event\ExecEvent;
 use pzr\amqp\event\PushEvent;
 use Yii;
@@ -155,8 +156,30 @@ class AmqpController extends Controller
             ]);
         }
         $response = Yii::$app->rpcQueue->setQos(10)->myPublishBatch($jobs);
+        return $response;
+    }
 
-        var_dump($response); die;
+    /**
+     * MyYii 的RPC 调用测试
+     *
+     * @param array $jobs  传的第一个参数是数组，却不能在方法定义中申明：array jobs 。
+     * 因为在yii\console\Controller 中判断：如果申明是数组，那么会用逗号隔开。
+     * @param integer $qos
+     * @param integer $timeout
+     * @return void
+     */
+    public function actionRpcTest($jobs, $qos=1, $timeout=3) {
+        // 单条请求
+        // $response = Yii::$app->rpcQueue->push(new RequestJob(
+        //     ['request' => 'request']
+        // ));
+        if (empty($jobs)) {
+            return null;
+        }
+        $response = Yii::$app->rpcQueue->setQos($qos)
+            ->setTimeout($timeout)
+            ->myPublishBatch($jobs);
+        return $response;
     }
 
 

@@ -12,6 +12,9 @@ defined('YII_DEBUG') or define('YII_DEBUG', true);
 defined('YII_ENV') or define('YII_ENV', 'dev');
 
 $baseDir = dirname(__DIR__, 2);
+if (!is_file( $baseDir . '/vendor/autoload.php' )) {
+    $baseDir = dirname(__DIR__, 5);
+}
 
 require $baseDir . '/vendor/autoload.php';
 require $baseDir . '/vendor/yiisoft/yii2/Yii.php';

@@ -59,7 +59,10 @@ class RpcAmqp extends MyAmqp
         } catch (Exception $e) {
             throw new UnknowException($e->getMessage());
         } finally {
-            return $this->_responses[$corrid];
+            // 必须返回的是对象才能够返回到请求方，否则会被Yii底层转成int型
+            return new Response([
+                'response' => $this->_responses[$corrid]
+            ]);
         }
     }
 
@@ -106,7 +109,10 @@ class RpcAmqp extends MyAmqp
         } catch (Exception $e) {
             throw new UnknowException($e->getMessage());
         } finally {
-            return $this->_responses;
+            // 必须返回的是对象才能够返回到请求方，否则会被Yii底层转成int型
+            return new Response([
+                'response' => $this->_responses
+            ]);
         }
     }
 

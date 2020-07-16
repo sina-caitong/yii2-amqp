@@ -171,5 +171,11 @@ https://www.yuque.com/zhangyu-tryjv/ebrhh2/goq33o
 
 ### RPC队列如何使用
 
+### RabbitMQ的五种队列
+
+### 消息、队列、路由 底层是如何工作的？
+
+### 
+
 ### 测试报告
 https://www.yuque.com/docs/share/8b4eb7b8-105a-42d3-85ee-17f9a65a0a33?#
