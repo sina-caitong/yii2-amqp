@@ -10,7 +10,6 @@ use pzr\amqp\event\ExecEvent;
 use pzr\amqp\event\PushEvent;
 use pzr\amqp\exception\MissPropertyException;
 use pzr\amqp\exception\UnknowException;
-use pzr\amqp\lib\AMQPConnection;
 use pzr\amqp\QueueInterface;
 use pzr\amqp\serializers\SerializerInterface;
 use pzr\amqp\serializers\PhpSerializer;

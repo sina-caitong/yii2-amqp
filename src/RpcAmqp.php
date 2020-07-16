@@ -55,7 +55,7 @@ class RpcAmqp extends MyAmqp
         $this->trigger(self::EVENT_AFTER_PUSH, new PushEvent(['job'=>$job]));
 
         $this->channel->basic_qos(null, 1, null);
-        $this->channel->basic_consume($this->_callbackQueueName, '', false, true, false, false, array($this, 'handleResponse'));
+        $this->channel->basic_consume($this->_callbackQueueName, '', false, false, false, false, array($this, 'handleResponse'));
         try {
             while (empty($this->_responses[$corrid])) {
                 $this->channel->wait(null, false, $this->_timeout);
@@ -105,7 +105,7 @@ class RpcAmqp extends MyAmqp
         $this->trigger(self::EVENT_AFTER_PUSH, $event);
         /** 即使可以通过一个channel启动多个消费者，但是消费者处理消息也不是并发处理 */
         $this->channel->basic_qos(null, $this->_qos, null);
-        $this->channel->basic_consume($this->_callbackQueueName, '', false, true, false, false, array($this, 'handleResponse'));
+        $this->channel->basic_consume($this->_callbackQueueName, '', false, false, false, false, array($this, 'handleResponse'));
 
         try {
             while (count($this->_corrids) != count($this->_responses)) {
@@ -131,6 +131,9 @@ class RpcAmqp extends MyAmqp
     {
         $corrid = $payload->get('correlation_id');
         $this->_responses[$corrid] = $payload->body;
+        $payload->delivery_info['channel']->basic_ack(
+            $payload->delivery_info['delivery_tag']
+        );
         $this->myLog('临时队列处理消息ID：' . $corrid);
     }
 
