@@ -36,6 +36,9 @@ class RpcAmqp extends MyAmqp
     public function push($job, $routingKey='')
     {
         $this->open();
+
+        $this->trigger(self::EVENT_BEFORE_PUSH, new PushEvent(['job'=>$job]));
+
         list($this->_callbackQueueName,,) = $this->channel->queue_declare("", false, false, true, false);
         if (empty($this->_callbackQueueName)) {
             throw new RpcException('callbackQueueName is empty');
@@ -49,6 +52,8 @@ class RpcAmqp extends MyAmqp
         ]);
         if (empty($routingKey)) $routingKey = $this->routingKey;
         $this->channel->basic_publish($payload, $this->exchangeName, $routingKey);
+
+        $this->trigger(self::EVENT_AFTER_PUSH, new PushEvent(['job'=>$job]));
 
         $this->channel->basic_qos(null, 1, null);
         $this->channel->basic_consume($this->_callbackQueueName, '', false, true, false, false, array($this, 'handleResponse'));
