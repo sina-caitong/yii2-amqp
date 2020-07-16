@@ -52,7 +52,6 @@ class RpcAmqp extends MyAmqp
         ]);
         if (empty($routingKey)) $routingKey = $this->routingKey;
         $this->channel->basic_publish($payload, $this->exchangeName, $routingKey);
-
         $this->trigger(self::EVENT_AFTER_PUSH, new PushEvent(['job'=>$job]));
 
         $this->channel->basic_qos(null, 1, null);
@@ -83,6 +82,8 @@ class RpcAmqp extends MyAmqp
         if (!is_array($jobs)) {
             throw new InvalidArgumentException('jobs is not a array');
         }
+        $event = new PushEvent(['jobs'=>$jobs]);
+        $this->trigger(self::EVENT_BEFORE_PUSH, $event);
 
         list($this->_callbackQueueName,,) = $this->channel->queue_declare("", false, false, true, false);
         if (empty($this->_callbackQueueName)) {
@@ -99,9 +100,8 @@ class RpcAmqp extends MyAmqp
             $this->_corrids[] = $job->getUuid();
             $this->batchBasicPublish($job, $this->exchangeName, $routingKey);
         }
-        $event = new PushEvent(['jobs' => $jobs]);
-        $this->trigger(self::EVENT_BEFORE_PUSH, $event);
         $this->publishBatch($event->noWait);
+
         $this->trigger(self::EVENT_AFTER_PUSH, $event);
         /** 即使可以通过一个channel启动多个消费者，但是消费者处理消息也不是并发处理 */
         $this->channel->basic_qos(null, $this->_qos, null);

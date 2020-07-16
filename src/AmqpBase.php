@@ -224,7 +224,7 @@ class AmqpBase extends Component implements QueueInterface
     /**
      * 推送消息
      *
-     * @param JobInterface $job
+     * @param AmqpJob $job
      * @param string $exchangeName
      * @param string $routingKey
      * @return string
