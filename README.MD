@@ -137,8 +137,7 @@ class CountJob extends \pzr\amqp\AmqpJob
 加载 amqp.php 中的 delayQueue 配置，然后在Controller中调用：  
 ```php
 Yii::$app->delayQueue->on(AmqpBase::EVENT_BEFORE_PUSH, function ($event) {
-    Yii::$app->delayQueue->bind(); //绑定队列，如果已经绑定可以注释此方法
-    // $event->noWait = true; //关闭客户端的消息确认机制
+    Yii::$app->delayQueue->bind();
 });
 
 Yii::$app->delayQueue->push(new CountJob([
@@ -168,14 +167,8 @@ Yii::$app->easyQueue->push($job);
 加载 amqp.php 中的 rpcQueue 配置，然后在Controller中调用：  
 ```php
 Yii::$app->rpcQueue->on(AmqpBase::EVENT_BEFORE_PUSH, function(PushEvent $event) {
-    Yii::$app->rpcQueue->bind();   //绑定队列，如果已经绑定可以注释此方法
-    // $event->noWait = true;        //关闭客户端的消息确认机制
+    Yii::$app->rpcQueue->bind();
 });
-
-// 单条请求
-// $response = Yii::$app->rpcQueue->push(new RequestJob(
-//     ['request' => 'request']
-// ));
 
 // 批量请求
 for ($i=1; $i<=10; $i++) {
@@ -184,7 +177,7 @@ for ($i=1; $i<=10; $i++) {
     ]);
 }
 // qos：临时队列消费者预处理的数量；timeout：临时队列等待消费者处理的超时时间，单位s
-$response = Yii::$app->rpcQueue->setQos(1)->setTimeout(5)->myPublishBatch($jobs);
+$response = Yii::$app->rpcQueue->setQos(1)->setTimeout(3)->myPublishBatch($jobs);
 
 var_dump($response); die;
 ```
