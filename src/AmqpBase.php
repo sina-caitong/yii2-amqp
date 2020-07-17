@@ -18,6 +18,9 @@ use yii\base\Event;
 use yii\base\Application as BaseApp;
 use yii\di\Instance;
 
+/**
+ * 对AMQP的基本方法的封装
+ */
 class AmqpBase extends Component implements QueueInterface
 {
     public $host = 'localhost';
@@ -264,7 +267,7 @@ class AmqpBase extends Component implements QueueInterface
     /**
      * 将待发送的消息先存入数组，然后将这组数据在通过publishBatch发送到AMQP Serve
      *
-     * @param \pzr\amqp\JobInterface $job
+     * @param AaqpJob $job
      * @param string $exchangeName
      * @param string $routingKey
      * @return void
@@ -345,6 +348,7 @@ class AmqpBase extends Component implements QueueInterface
         $job = $this->serializer->unserialize($payload->getBody());
 
         if (!($job instanceof AmqpJob)) {
+            $payload->nack(false);
             return false;
         }
 
@@ -355,9 +359,9 @@ class AmqpBase extends Component implements QueueInterface
         try {
             $event->result = $event->job->execute();
             if ($event->result !== false) {
-                $this->channel->basic_ack($payload->delivery_info['delivery_tag']);
+                $payload->ack(true);
             } else {
-                $this->channel->basic_nack($payload->delivery_info['delivery_tag']);
+                $payload->nack(true, true);
             }
         } catch (\Exception $error) {
             $event->error = $error;

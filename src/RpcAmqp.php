@@ -10,6 +10,9 @@ use pzr\amqp\exception\InvalidArgumentException;
 use pzr\amqp\exception\RpcException;
 use pzr\amqp\exception\UnknowException;
 
+/**
+ * 通过AMQP实现RPC调用
+ */
 class RpcAmqp extends MyAmqp
 {
     /** @var string 临时队列名称 */
@@ -25,7 +28,7 @@ class RpcAmqp extends MyAmqp
     private $_qos = 1;
 
     /** @var int 临时队列消费者的超时时间，单位seconds */
-    private $_timeout = 10;
+    private $_timeout = 3;
 
     /**
      * 单条消息处理
@@ -33,29 +36,30 @@ class RpcAmqp extends MyAmqp
      * @param AmqpJob $job 
      * @return void
      */
-    public function push($job, $routingKey='')
+    public function push($job, $routingKey = '')
     {
         $this->open();
-
-        $this->trigger(self::EVENT_BEFORE_PUSH, new PushEvent(['job'=>$job]));
-
+        $this->trigger(self::EVENT_BEFORE_PUSH, new PushEvent(['job' => $job]));
+        // 匿名队列
         list($this->_callbackQueueName,,) = $this->channel->queue_declare("", false, false, true, false);
-        if (empty($this->_callbackQueueName)) {
-            throw new RpcException('callbackQueueName is empty');
-        }
-        $message = $this->serializer->serialize($job);
+        // 发送请求
         $corrid = $job->getUuid();
         $this->myLog('请求唯一ID：' . $corrid . '; 临时队列名称：' . $this->_callbackQueueName);
-        $payload = new AMQPMessage($message, [
-            'correlation_id' => $corrid,
-            'reply_to' => $this->_callbackQueueName,
-        ]);
+        $payload = new AMQPMessage(
+            $this->serializer->serialize($job),
+            [
+                'correlation_id' => $corrid,
+                'reply_to' => $this->_callbackQueueName,
+            ]
+        );
         if (empty($routingKey)) $routingKey = $this->routingKey;
         $this->channel->basic_publish($payload, $this->exchangeName, $routingKey);
-        $this->trigger(self::EVENT_AFTER_PUSH, new PushEvent(['job'=>$job]));
 
+        $this->trigger(self::EVENT_AFTER_PUSH, new PushEvent(['job' => $job]));
+        // 开启临时队列的消费者：自动ack
         $this->channel->basic_qos(null, 1, null);
-        $this->channel->basic_consume($this->_callbackQueueName, '', false, false, false, false, array($this, 'handleResponse'));
+        $this->channel->basic_consume($this->_callbackQueueName, '', false, true, false, false, array($this, 'handleResponse'));
+        // 等待RCK队列消费返回响应
         try {
             while (empty($this->_responses[$corrid])) {
                 $this->channel->wait(null, false, $this->_timeout);
@@ -63,7 +67,7 @@ class RpcAmqp extends MyAmqp
         } catch (Exception $e) {
             throw new UnknowException($e->getMessage());
         } finally {
-            // 必须返回的是对象才能够返回到请求方，否则会被Yii底层转成int型
+            // 必须是对象才能够返回到请求方，否则会被Yii底层转成int型
             return new Response([
                 'response' => $this->_responses[$corrid]
             ]);
@@ -76,21 +80,18 @@ class RpcAmqp extends MyAmqp
      * @param array $jobs
      * @return void
      */
-    public function myPublishBatch(array $jobs, $routingKey='')
+    public function myPublishBatch(array $jobs, $routingKey = '')
     {
         $this->open();
         if (!is_array($jobs)) {
             throw new InvalidArgumentException('jobs is not a array');
         }
-        $event = new PushEvent(['jobs'=>$jobs]);
+        $event = new PushEvent(['jobs' => $jobs]);
         $this->trigger(self::EVENT_BEFORE_PUSH, $event);
-
+        // 声明临时队列
         list($this->_callbackQueueName,,) = $this->channel->queue_declare("", false, false, true, false);
-        if (empty($this->_callbackQueueName)) {
-            throw new RpcException('callbackQueueName is empty');
-        }
         $this->myLog('临时队列名称：' . $this->_callbackQueueName);
-
+        // 批量发送消息
         if (empty($routingKey)) $routingKey = $this->routingKey;
         $routingKey = $this->duplicater->getRoutingKey($routingKey, $this->duplicate);
         foreach ($jobs as $job) {
@@ -105,8 +106,8 @@ class RpcAmqp extends MyAmqp
         $this->trigger(self::EVENT_AFTER_PUSH, $event);
         /** 即使可以通过一个channel启动多个消费者，但是消费者处理消息也不是并发处理 */
         $this->channel->basic_qos(null, $this->_qos, null);
-        $this->channel->basic_consume($this->_callbackQueueName, '', false, false, false, false, array($this, 'handleResponse'));
-
+        $this->channel->basic_consume($this->_callbackQueueName, '', false, true, false, false, array($this, 'handleResponse'));
+        // 等待RPC队列响应
         try {
             while (count($this->_corrids) != count($this->_responses)) {
                 $this->channel->wait(null, false, $this->_timeout);
@@ -114,7 +115,7 @@ class RpcAmqp extends MyAmqp
         } catch (Exception $e) {
             throw new UnknowException($e->getMessage());
         } finally {
-            // 必须返回的是对象才能够返回到请求方，否则会被Yii底层转成int型
+            // 必须是对象才能够返回到请求方，否则会被Yii底层转成int型
             return new Response([
                 'response' => $this->_responses
             ]);
@@ -131,16 +132,13 @@ class RpcAmqp extends MyAmqp
     {
         $corrid = $payload->get('correlation_id');
         $this->_responses[$corrid] = $payload->body;
-        $payload->delivery_info['channel']->basic_ack(
-            $payload->delivery_info['delivery_tag']
-        );
         $this->myLog('临时队列处理消息ID：' . $corrid);
     }
 
     /**
      * @inheritDoc
      *
-     * @param \pzr\amqp\AmqpJob $job
+     * @param AmqpJob $job
      * @param string $exchangeName
      * @param string $routingKey
      * @return void
@@ -156,6 +154,29 @@ class RpcAmqp extends MyAmqp
             $exchangeName,
             $routingKey
         );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function consume($queueName, $qos = 1, $consumerTag = '')
+    {
+        $this->open();
+        $callback = function (AMQPMessage $payload) {
+            $this->handleMessage($payload);
+        };
+
+        /*
+         * prefetch_size 消费者所能接受未确认消息的总体大小
+         * prefetch_count  所能接受最大的未确认条数
+         * a_global
+         */
+        $this->channel->basic_qos(null, $qos, null);
+        /** 开启自动ack，防止因为消息异常而导致一直无法消费成功 */
+        $this->channel->basic_consume($queueName, $consumerTag, false, true, false, false, $callback);
+        while (count($this->channel->callbacks)) {
+            $this->channel->wait();
+        }
     }
 
     /**
@@ -187,15 +208,12 @@ class RpcAmqp extends MyAmqp
     public function pushResponse($payload, $response)
     {
         $response = $this->serializer->serialize($response);
-        if (empty($payload->get('correlation_id'))) {
-            throw new InvalidArgumentException('correlation_id is empty');
-        }
         $message = new AMQPMessage(
             $response,
             array('correlation_id' => $payload->get('correlation_id'))
         );
 
-        $payload->delivery_info['channel']->basic_publish(
+        $payload->getChannel()->basic_publish(
             $message,
             '',
             $payload->get('reply_to')
@@ -224,7 +242,7 @@ class RpcAmqp extends MyAmqp
         return $this;
     }
 
-     /**
+    /**
      * 批量请求的时候返回多个响应
      *
      * @return void

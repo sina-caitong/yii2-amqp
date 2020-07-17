@@ -12,6 +12,9 @@ use pzr\amqp\exception\MissPropertyException;
 use pzr\amqp\exception\UnknowException;
 use yii\di\Instance;
 
+/**
+ * 结合实践中的用例而封装
+ */
 class MyAmqp extends AmqpBase
 {
 
@@ -35,7 +38,7 @@ class MyAmqp extends AmqpBase
 
 
     /**
-     * 为了优化flow，实例化多个queue同时处理对应的exchange，从而达到高的吞吐量
+     * 启动队列副本后自动申明多个队列
      * @param $queueName
      * @param array $arguments
      * @return mix
@@ -61,6 +64,15 @@ class MyAmqp extends AmqpBase
         }
     }
 
+    /**
+     * 启用队列副本后自动绑定多个队列
+     *
+     * @param string $queueName
+     * @param string $exchangeName
+     * @param string $routingKey
+     * @param array $arguments
+     * @return void
+     */
     final public function queuesBind($queueName, $exchangeName, $routingKey = '', $arguments = [])
     {
         if (empty($queueName) || empty($exchangeName) || empty($routingKey)) {
