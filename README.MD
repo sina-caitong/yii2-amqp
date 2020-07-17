@@ -179,7 +179,7 @@ for ($i=1; $i<=10; $i++) {
 // qos：临时队列消费者预处理的数量；timeout：临时队列等待消费者处理的超时时间，单位s
 $response = Yii::$app->rpcQueue->setQos(1)->setTimeout(3)->myPublishBatch($jobs);
 
-var_dump($response); die;
+return $response;
 ```
 注意：RPC队列的消费者必须启用 amqp.php 中 的 rpcConsumer 配置才可使用。
 
