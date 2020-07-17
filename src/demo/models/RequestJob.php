@@ -4,6 +4,9 @@ namespace app\models;
 
 use pzr\amqp\AmqpJob;
 
+/**
+ * @example DEMO
+ */
 class RequestJob extends AmqpJob
 {    
 
@@ -13,25 +16,5 @@ class RequestJob extends AmqpJob
     {
         $response = $this->request . ', corrid:' . $this->getUuid();
         return $response;
-    }
-
-    /**
-     * Get the value of request
-     */ 
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    /**
-     * Set the value of request
-     *
-     * @return  self
-     */ 
-    public function setRequest($request)
-    {
-        $this->request = $request;
-
-        return $this;
     }
 }

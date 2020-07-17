@@ -44,7 +44,6 @@ class RpcAmqp extends MyAmqp
         list($this->_callbackQueueName,,) = $this->channel->queue_declare("", false, false, true, false);
         // 发送请求
         $corrid = $job->getUuid();
-        $this->myLog('请求唯一ID：' . $corrid . '; 临时队列名称：' . $this->_callbackQueueName);
         $payload = new AMQPMessage(
             $this->serializer->serialize($job),
             [
@@ -90,7 +89,6 @@ class RpcAmqp extends MyAmqp
         $this->trigger(self::EVENT_BEFORE_PUSH, $event);
         // 声明临时队列
         list($this->_callbackQueueName,,) = $this->channel->queue_declare("", false, false, true, false);
-        $this->myLog('临时队列名称：' . $this->_callbackQueueName);
         // 批量发送消息
         if (empty($routingKey)) $routingKey = $this->routingKey;
         $routingKey = $this->duplicater->getRoutingKey($routingKey, $this->duplicate);
@@ -132,7 +130,6 @@ class RpcAmqp extends MyAmqp
     {
         $corrid = $payload->get('correlation_id');
         $this->_responses[$corrid] = $payload->body;
-        $this->myLog('临时队列处理消息ID：' . $corrid);
     }
 
     /**
@@ -188,7 +185,6 @@ class RpcAmqp extends MyAmqp
      */
     public function handleMessage(AMQPMessage $payload)
     {
-        $this->myLog('RPC队列处理消息ID：' . $payload->get('correlation_id'));
         $event = parent::handleMessage($payload);
 
         if ($event->result !== false) {

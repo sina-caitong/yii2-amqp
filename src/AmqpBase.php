@@ -86,7 +86,6 @@ class AmqpBase extends Component implements QueueInterface
         parent::init();
         $this->serializer = Instance::ensure($this->serializer, SerializerInterface::class);
         Event::on(BaseApp::class, BaseApp::EVENT_AFTER_REQUEST, function () {
-            $this->myLog('========CLOSE Connection=======' . PHP_EOL);
             $this->close();
         });
     }
@@ -392,7 +391,6 @@ class AmqpBase extends Component implements QueueInterface
         if ($this->channel) {
             return;
         }
-        $this->myLog('========OPEN Connection========');
         $this->connection = new AMQPStreamConnection($this->host, $this->port, $this->user, $this->password, $this->vhost);
         $this->channel = $this->connection->channel();
     }
@@ -408,12 +406,6 @@ class AmqpBase extends Component implements QueueInterface
         $this->channel->close();
         $this->connection->close();
     }
-
-    public function myLog($msg) {
-        @error_log(date('Y-m-d H:i:s') . '：' . $msg . PHP_EOL, 3, __DIR__ . '/demo/runtime/logs/test.log');
-    }
-
-
 
     /**
      * 删除队列

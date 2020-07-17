@@ -8,21 +8,21 @@ class AmqpJob extends BaseObject implements JobInterface
 {
 
     /**
-     * RpcAmqp will be used
+     * RPC客户端请求的唯一标志
      *
      * @var string
      */
     private $uuid;
 
     /**
-     * 优先队列定义的时候用到
+     * 优先队列定义
      *
      * @var integer
      */
     private $priority = 0;
 
     public function init() {
-        $this->setUuid(uniqid(true));
+        $this->getUuid() or $this->setUuid(uniqid(true));
         parent::init();
     }
 

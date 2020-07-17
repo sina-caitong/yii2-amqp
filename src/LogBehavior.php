@@ -21,8 +21,8 @@ class LogBehavior extends Behavior
         return [
             // AmqpBase::EVENT_BEFORE_PUSH => 'beforePush',
             // AmqpBase::EVENT_AFTER_PUSH => 'afterPush',
-            AmqpBase::EVENT_PUSH_ACK => 'pushAck',
-            AmqpBase::EVENT_PUSH_NACK => 'pushNack',
+            // AmqpBase::EVENT_PUSH_ACK => 'pushAck',
+            // AmqpBase::EVENT_PUSH_NACK => 'pushNack',
             // AmqpBase::EVENT_BEFORE_EXEC => 'beforeExec',
             // AmqpBase::EVENT_AFTER_EXEC => 'afterExec',
         ];
@@ -53,7 +53,6 @@ class LogBehavior extends Behavior
      */
     public function pushAck(PushEvent $event)
     {
-        error_log("ack \n", 3, '/Users/pzr/test.log');
     }
 
     /**
@@ -64,7 +63,6 @@ class LogBehavior extends Behavior
      */
     public function pushNack(PushEvent $event)
     {
-        error_log("nack \n", 3, '/Users/pzr/test.log');
     }
 
     public function beforeExec(ExecEvent $event)
