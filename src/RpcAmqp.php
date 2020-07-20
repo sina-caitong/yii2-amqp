@@ -7,7 +7,6 @@ use PhpAmqpLib\Message\AMQPMessage;
 use pzr\amqp\event\ExecEvent;
 use pzr\amqp\event\PushEvent;
 use pzr\amqp\exception\InvalidArgumentException;
-use pzr\amqp\exception\RpcException;
 use pzr\amqp\exception\UnknowException;
 
 /**
@@ -186,11 +185,7 @@ class RpcAmqp extends MyAmqp
     public function handleMessage(AMQPMessage $payload)
     {
         $event = parent::handleMessage($payload);
-
-        if ($event->result !== false) {
-            $this->pushResponse($payload, $event->result);
-        }
-
+        $this->pushResponse($payload, $event->result);
         return $event;
     }
 

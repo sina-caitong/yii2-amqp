@@ -66,10 +66,20 @@ class MyYii
             $response = $this->_application->handleRequest($this->_request);
             $response->send();
             $rpcResponse = $response->exitStatus;
-            if ($rpcResponse instanceof Response) {
-                return $this->serializer->serialize($rpcResponse->getResponse());
+            if (!($rpcResponse instanceof Response)) {
+                return $rpcResponse;
             }
-            return $rpcResponse;
+
+            $result = $rpcResponse->getResponse();
+            if (!is_array($result)) {
+                return $this->serializer->unserialize($result);
+            }
+
+            $results = [];
+            foreach( $result as $corrid => $r ) {
+                $results[$corrid] = $this->serializer->unserialize($r);
+            }
+            return $results;
         } catch (ExitException $e) {
             $this->_application->end($e->statusCode, isset($response) ? $response : null);
             return false;
