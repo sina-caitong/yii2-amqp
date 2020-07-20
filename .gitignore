@@ -2,4 +2,6 @@
 /src/demo/config/MY_amqp.php
 /src/demo/runtime/
 /src/runtime/
+/src/demo/.DS_Store
+/src/.DS_Store
 
