@@ -1,8 +1,8 @@
 ## 基本用法
 
-引入包：  
+引入包(目前处于测试版本)：  
 ```shell
-composer require pzr/amqp
+composer require pzr/amqp:dev-master
 ```
 
 在项目中也有详细的demo可供参考  
