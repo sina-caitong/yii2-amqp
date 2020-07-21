@@ -184,7 +184,25 @@ class RpcAmqp extends MyAmqp
      */
     public function handleMessage(AMQPMessage $payload)
     {
-        $event = parent::handleMessage($payload);
+        $job = $this->serializer->unserialize($payload->getBody());
+
+        if (!($job instanceof AmqpJob)) {
+            return false;
+        }
+
+        $event = new ExecEvent(['job' => $job]);
+
+        $this->trigger(self::EVENT_BEFORE_EXEC, $event);
+
+        try {
+            $event->result = $event->job->execute();
+        } catch (\Exception $error) {
+            $event->error = $error;
+        } catch (\Throwable $error) {
+            $event->error = $error;
+        }
+        $this->trigger(self::EVENT_AFTER_EXEC, $event);
+
         $this->pushResponse($payload, $event->result);
         return $event;
     }
