@@ -121,8 +121,8 @@ class AmqpController extends Controller
     }
 
     /**
-     * 只是一个DEMO，无法正常运行
-     *
+     * RPC 批量发送请求
+     * 
      * @return void
      */
     public function actionRpcServe($jobs, $qos=1, $timeout=3) {
@@ -134,10 +134,29 @@ class AmqpController extends Controller
         });
 
         /**
-         * 这里定义为批量发送是因为既能支持单条又能支持批量
+         * 既能支持单条又能支持批量
          */
         $response = Yii::$app->serveQueue->setQos($qos)->setTimeout($timeout)->myPublishBatch($jobs);
         return $response;
+    }
+
+    /**
+     * 测试开启strict模式
+     * php yii amqp/test-strict
+     * @return void
+     */
+    public function actionTestStrict() {
+        Yii::$app->easyQueue->on(AmqpBase::EVENT_BEFORE_PUSH, function(PushEvent $event) {
+            Yii::$app->easyQueue->bind();   //绑定队列，如果已经绑定可以注释此方法
+        });
+
+        // 批量发送
+        for ($i=1; $i<=10; $i++) {
+            $jobs[] = new CountJob([
+                'count' => $i
+            ]);
+        }
+        Yii::$app->easyQueue->myPublishBatch($jobs);
     }
 
 }

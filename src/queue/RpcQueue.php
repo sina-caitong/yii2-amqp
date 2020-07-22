@@ -8,6 +8,10 @@ class RpcQueue extends RpcAmqp
 {
 
     public function bind() {
+        // 防止队列被篡改
+        if ($this->isQueueCreated()) {
+            return true;
+        }
         $this->open();
         $queueName = $this->queueName;
         $exchangeName = $this->exchangeName;

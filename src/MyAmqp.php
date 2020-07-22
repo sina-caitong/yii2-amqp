@@ -4,6 +4,7 @@
 namespace pzr\amqp;
 
 use Exception;
+use pzr\amqp\api\AmqpApi;
 use pzr\amqp\duplicate\DuplicateInterface;
 use pzr\amqp\duplicate\DuplicateRandom;
 use pzr\amqp\event\PushEvent;
@@ -49,7 +50,7 @@ class MyAmqp extends AmqpBase
             throw new MissPropertyException('Missing necessary parameters of queueName');
         }
 
-        if ($this->duplicate < 1) {
+        if ($this->duplicate <= 1) {
             $this->queueDeclare($queueName, $arguments);
             return;
         }
@@ -79,7 +80,7 @@ class MyAmqp extends AmqpBase
             throw new MissPropertyException('Missing necessary parameters of queueName or exchangeName or routingKey');
         }
 
-        if ($this->duplicate < 1) {
+        if ($this->duplicate <= 1) {
             $this->queueBind($queueName, $exchangeName, $routingKey, $arguments);
             return;
         }
@@ -144,5 +145,29 @@ class MyAmqp extends AmqpBase
         if (empty($routingKey)) $routingKey = $this->routingKey;
         $routingKey = $this->duplicater->getRoutingKey($routingKey, $this->duplicate);
         return parent::push($job, $routingKey);
+    }
+
+    /**
+     * @inheritDoc
+     * @return bool false可以被创建，true不能被创建
+     */
+    protected function isQueueCreated($queueName='')
+    {
+        if (false === $this->strict) return false;
+        if ($this->duplicate <= 1) {
+            return parent::isQueueCreated();
+        }
+
+        $queueName = $this->queueName;
+        $duplicate = $this->duplicate;
+        $i = 0;
+        while ($duplicate) {
+            $queueNameTmp = $queueName . '_' . $i;
+            $flag = parent::isQueueCreated($queueNameTmp);
+            if ($flag) return true;
+            $i++;
+            $duplicate--;
+        }
+        return false;
     }
 }

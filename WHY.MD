@@ -61,7 +61,7 @@ Yii::$app->easyQueueTopic->push(new CountJob([
 
 配置镜像后，则在node1和node2都各自有queue1和queue2的镜像，因此网络分区后不再受影响。但是需要考虑如何恢复在一个分区。  
 
-### 网络分区后如何恢复
+### 网络分区
 
 
 ### 备份路由器
@@ -153,6 +153,8 @@ Yii::$app->delayQueue->on(AmqpBase::EVENT_BEFORE_PUSH, function ($event) {
 消息被消费之前会触发 EVENT_BEFORE_EXEC 事件  
 消息被消费之后会触发 EVENT_AFTER_EXEC 事件  
 
+注：RPC队列是关闭消费者消息确认机制的  
+
 ### QOS如何设置？ 
 QOS是什么意思？  
 消费者预处理的消息数量  
@@ -169,13 +171,15 @@ QOS = (deliver + handle + ack) / handle
 
 https://www.yuque.com/zhangyu-tryjv/ebrhh2/goq33o 
 
-### RPC队列如何使用
-
 ### RabbitMQ的五种队列
 
 ### 消息、队列、路由 底层是如何工作的？
 
-### 
+### 元数据管理与监控
+元数据是什么？  
+指的是：交换器、队列及绑定关系  
+管理监控的目的：保护某些队列的元数据不会被无意间篡改。  
+
 
 ### 测试报告
 https://www.yuque.com/docs/share/8b4eb7b8-105a-42d3-85ee-17f9a65a0a33?

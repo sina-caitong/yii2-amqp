@@ -11,7 +11,7 @@ class AmqpApi extends Component
 
     protected static $http;
     public $vhost = '/';
-    public $host;
+    public $host = '127.0.0.1';
     public $port = 15672;
     public $apiUri;
     public $user = 'guest';
@@ -27,55 +27,65 @@ class AmqpApi extends Component
         parent::init();
     }
 
-    protected function formatApiUrl($apiName, $reqSuffix='') {
-        return sprintf("%s/%s/%s/%s", $this->apiUri, $apiName, $this->vhost, $reqSuffix);
-    }
-
-    protected function handleError($filed) {
-        throw new InvalidArgumentException('Unexcept value about ' . $filed);
+    /**
+     * http://127.0.0.1:15672/api/queues/%2F/queueName/bindings
+     *
+     * @return void
+     */
+    public function getBinding($queueName) {
+        if (empty($queueName)) {
+            $this->handleError('queueName');
+        }
+        $reqUrl = $this->formatApiUrl('queues', $queueName . '/bindings');
+        $options = $this->getHttpOptions();
+        $data = self::$http->request('GET', $reqUrl, $options)->getContent();
+        return json_decode($data, true);
     }
 
     /**
-     * eg：http://10.71.13.24:15672/api/queues/%2F/dlx.queue
+     * eg：http://127.0.0.1:15672/api/queues/%2F/queueName
      * @param $queueName
      * @param string $vhost
-     * @return array|bool|mixed|stdClass
+     * @return array
      */
     public function getInfosByQueue($queueName) {
         if (empty($queueName)) {
             $this->handleError('queueName');
         }
         $reqUrl = $this->formatApiUrl('queues', $queueName);
-        $data = self::$http->request('GET', $reqUrl)->getContent();
+        $options = $this->getHttpOptions();
+        $data = self::$http->request('GET', $reqUrl, $options)->getContent();
         return json_decode($data, true);
     }
 
 
     /**
-     * eg：http://10.71.13.24:15672/api/exchanges/%2F/dlx.exchange
+     * eg：http://127.0.0.1:15672/api/exchanges/%2F/exchangeName
      * @param $queueName
      * @param string $vhost
-     * @return array|bool|mixed|stdClass
+     * @return array
      */
     public function getInfosByExchange($exchangeName) {
         if (empty($exchangeName)) {
             $this->handleError('exchangeName');
         }
         $reqUrl = $this->formatApiUrl('exchanges', $exchangeName);
-        $data = self::$http->request('GET', $reqUrl)->getContent();
+        $options = $this->getHttpOptions();
+        $data = self::$http->request('GET', $reqUrl, $options)->getContent();
         return json_decode($data, true);
     }
 
     /**
      * 检验vhost的状态
      * 原理是amqp会发送一个消息到内置的queue，即aliveness-test
-     * eg：http://10.71.13.24:15672/api/aliveness-test/%2F
+     * eg：http://127.0.0.1:15672/api/aliveness-test/%2F
      * @param string $vhost
      * @return bool
      */
     public function checkStatus() {
         $reqUrl = $this->formatApiUrl('aliveness-test');
-        $data = self::$http->request('GET', $reqUrl)->getContent();
+        $options = $this->getHttpOptions();
+        $data = self::$http->request('GET', $reqUrl, $options)->getContent();
         $statusArr = json_decode($data, true);
         $status = $statusArr['status'];
         if ($status=='ok') {
@@ -87,13 +97,30 @@ class AmqpApi extends Component
 
     /**
      * RabbitMQ的内存使用情况
-     * eg：http://10.71.13.24:15672/api/nodes
+     * eg：http://127.0.0.1:15672/api/nodes
      */
     public function monityMemory() {
         $reqUrl = $this->formatApiUrl('nodes');
         $json = self::$http->request('GET', $reqUrl)->getContent();
         $data = json_decode($json, true);
         return $data;
+    }
+
+    protected function formatApiUrl($apiName, $reqSuffix='') {
+        return sprintf("%s/%s/%s/%s", $this->apiUri, $apiName, $this->vhost, $reqSuffix);
+    }
+
+    protected function handleError($filed) {
+        throw new InvalidArgumentException('Unexcept value about ' . $filed);
+    }
+    
+    public function getHttpOptions(array $httpOptions=[]) {
+        $options = [
+            'headers' => ['Content-Type: application/json'],
+            'auth_basic' => $this->user . ':' . $this->password,
+        ];
+        
+        return array_merge($options, $httpOptions);
     }
 
 

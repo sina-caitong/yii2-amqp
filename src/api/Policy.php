@@ -41,11 +41,7 @@ class Policy extends AmqpApi
             'apply-to' => $this->applyTo,
             'name' => $this->name,
         ];
-        $options = [
-            'headers' => ['Content-Type: application/json'],
-            'body' => json_encode($post),
-            'auth_basic' => $this->user . ':' . $this->password,
-        ];
+        $options = $this->getHttpOptions(['body' => json_encode($post)]);
         $data = self::$http->request('PUT', $reqUrl, $options)->getContent();
         return $data;
     }

@@ -38,6 +38,7 @@ $config = [
         'rpcQueue' => $amqp['rpcQueue'],
         'rpcConsumer' => $amqp['rpcConsumer'],
         'easyQueueTopic' => $amqp['easyQueueTopic'],
+        'amqpApi' => $amqp['amqpApi'],
     ],
     'params' => $params,
     /*

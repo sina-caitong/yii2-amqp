@@ -6,8 +6,12 @@ use Exception;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
+use pzr\amqp\api\AmqpApi;
+use pzr\amqp\api\ApiInterface;
+use pzr\amqp\api\Policy;
 use pzr\amqp\event\ExecEvent;
 use pzr\amqp\event\PushEvent;
+use pzr\amqp\exception\InvalidArgumentException;
 use pzr\amqp\exception\MissPropertyException;
 use pzr\amqp\exception\UnknowException;
 use pzr\amqp\QueueInterface;
@@ -34,19 +38,22 @@ class AmqpBase extends Component implements QueueInterface
     public $exchangeType = ExchangeType::DIRECT;
     public $arguments;
 
-    protected $channel;
-    protected $connection;
-    /**
-     * 定义队列的优先级
-     *
-     * @var int
-     */
+    /** @var bool true则开启严谨模式，校验队列是否已绑定 */
+    public $strict = false;
+
+    /** @var SerializerInterface|array */
+    public $serializer = PhpSerializer::class;
+
+    /** @var int 定义队列的优先级 */
     public $priority;
 
-    /**
-     * @var SerializerInterface|array
-     */
-    public $serializer = PhpSerializer::class;
+    /** @var AmqpApi */
+    protected $api;
+
+    protected $channel;
+    protected $connection;
+
+
 
     /**
      * @event PushEvent
@@ -135,13 +142,10 @@ class AmqpBase extends Component implements QueueInterface
     }
 
     /**
-     * Direct exchange: 如果 routing key 匹配, 那么Message就会被传递到相应的queue中。其实在queue创建时，它会自动的以queue的名字作为routing key来绑定那个exchange。
-     * Fanout exchange: 会向响应的queue广播。
-     * Topic exchange: 对key进行模式匹配，比如ab*可以传递到所有ab*的queue。
      * @param $exchangeName
      * @param $exchangeType
      * @param array $arguments
-     * @return bool|mixed|null
+     * @return mixed
      */
     final public function exchangeDeclare($exchangeName, $exchangeType, $arguments = [])
     {
@@ -405,6 +409,70 @@ class AmqpBase extends Component implements QueueInterface
         }
         $this->channel->close();
         $this->connection->close();
+    }
+
+    /**
+     * 检查队列是否已经被绑定
+     * @param string $queueName
+     * @return bool
+     */
+    protected function isQueueCreated($queueName = '')
+    {
+        if (false === $this->strict) return false;
+        if (empty($this->api)) {
+            $this->api = new AmqpApi([
+                'vhost' => $this->vhost,
+                'host' => $this->host,
+                'user' => $this->user,
+                'password' => $this->password,
+            ]);
+            // throw new InvalidArgumentException('the object of api is null');
+        }
+        if (empty($queueName)) $queueName = $this->queueName;
+        try {
+            $info = $this->api->getBinding($queueName);
+        } finally {
+            // 该队列未被定义
+            if (is_array($info) && empty($info)) return false;
+            // 已被定义或防止某次HTTP请求失败造成的篡改
+            return true;
+        }
+    }
+
+    public function setApi($config) {
+        if (isset($config['component']) && !empty($config['component'])) {
+            $component = $config['component'];
+            $this->api = Instance::ensure($component);
+            return;
+        }
+
+        if (empty($config['class'])) {
+            return false;
+        }
+        $class = $config['class'];
+        unset($config['class']);
+
+        $config['vhost'] = $this->vhost;
+        $config['user'] = $this->user;
+        $config['password'] = $this->password;
+        $config['host'] = $this->host;
+        $config['port'] = isset($config['port']) ? $config['port'] : 15672;
+        $policyConfig = isset($config['policyConfig']) ? $config['policyConfig'] : [];
+        unset($config['policyConfig']);
+        
+        $api = new $class($config);
+        if (!($api instanceof AmqpApi)) {
+            throw new InvalidArgumentException('invalid object of: api');
+        }
+        if ($api instanceof Policy && !empty($policyConfig)) {
+            $api->setPolicyConfig($policyConfig);
+            $api->setPolicy();
+        }
+        $this->api = $api;
+    }
+
+    public function getApi() {
+        return $this->api;
     }
 
     /**
