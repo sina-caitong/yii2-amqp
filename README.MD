@@ -264,3 +264,69 @@ loglevel=info;
 Yii::$app->policy->setPolicy();
 ```
 
+<hr>
+
+### 功能扩展
+* 增加队列绑定的严谨模式，防止已创建的队列被无意篡改。  
+* 集成AMQPAPI功能
+* 增加消息分发的自动路由策略  
+
+#### 开启严谨模式
+在 amqp.php 配置中配置 "strict" 为true 即可。如：
+```php
+'<Queue>' => [
+    'class' =>  \pzr\amqp\queue\<QueueName>::class,
+    // ...省略
+    'strict' => true,
+```
+开启队列创建的严谨模式之后，在创建队列之前会先查看是否已经有队列创建，如果有则不再创建。  
+需要注意的是：如果开启了队列副本且已创建个别队列的情况下，增加副本数量也不会新增队列。  
+
+这种模式只是简单的做了一个队列防止再被创建的保护，但是如果需要对AMQP的元数据（队列、交换器、绑定关系）进行更多的保护，可以通过调用 http://127.0.0.1:15672/api/definitions/ 查看队列的元数据并且做相应的保护。
+
+#### 集成AMQPAPI
+默认情况下会复用部分当前队列的配置属性创建API对象，可以通过 `Yii::$app->easyQueue->getApi()` 获取AmqpApi 对象。
+
+但是如果想要申明自己的API对象，可以有两种方式：  
+
+1、复用Yii已定义的组件  
+```php
+'easyQueue' => [
+        'class' =>  \pzr\amqp\queue\EasyQueue::class,
+        // ...省略
+        'api' => [
+            'component' => 'amqpApi',
+        ]
+    ],
+```
+2、配置API属性，实例化AmqpApi对象  
+```php
+'api' => [
+    'class' => \pzr\amqp\api\AmqpApi::class,
+]
+```
+3、配置API属性，实例化Policy对象
+```php
+'api' => [
+    'class' => \pzr\amqp\api\Policy::class,
+    'policyConfig' => [
+        'pattern' => 'easy_queue_*',
+        'definition' => [
+            'ha-mode' => 'all',
+            'ha-sync-mode' => 'manual',
+        ],
+        'priority' => 0,
+        'apply-to' => 'queues',
+        'name' => 'easy_queue',
+    ]
+]
+```
+
+实例化Policy对象之后，就可以在事件 EVENT_BEFORE_PUSH 之前设置策略，如
+```php
+Yii::$app->easyQueue->on(AmqpBase::EVENT_BEFORE_PUSH, function(PushEvent $event) {
+    Yii::$app->easyQueue->bind();
+    // 设定策略
+    Yii::$app->easyQueue->getApi()->setPolicy();
+});
+```
