@@ -25,7 +25,7 @@ use yii\di\Instance;
 /**
  * 对AMQP的基本方法的封装
  */
-class AmqpBase extends Component implements QueueInterface
+class AmqpBase extends Component
 {
     public $host = 'localhost';
     public $port = 5672;
@@ -95,13 +95,6 @@ class AmqpBase extends Component implements QueueInterface
         Event::on(BaseApp::class, BaseApp::EVENT_AFTER_REQUEST, function () {
             $this->close();
         });
-    }
-
-    /**
-     * 绑定队列和路由的方法实现
-     */
-    public function bind()
-    {
     }
 
     /**
@@ -207,18 +200,17 @@ class AmqpBase extends Component implements QueueInterface
      * @param string $routingKey
      * @return void
      */
-    public function push($job, $routingKey = '')
+    public function push($job)
     {
         $exchangeName = $this->exchangeName;
-        if (empty($routingKey)) $routingKey = $this->routingKey;
         $event = new PushEvent([
             'job' => $job,
             'exchangeName' => $exchangeName,
-            'routingKey' => $routingKey,
+            'routingKey' => $this->routingKey,
         ]);
 
         $this->trigger(self::EVENT_BEFORE_PUSH, $event);
-        $id = $this->pushMessage($event->job, $exchangeName, $routingKey, $event->noWait);
+        $id = $this->pushMessage($event->job, $exchangeName, $this->routingKey, $event->noWait);
         $event->id = $id;
 
         $this->trigger(self::EVENT_AFTER_PUSH, $event);
@@ -426,7 +418,6 @@ class AmqpBase extends Component implements QueueInterface
                 'user' => $this->user,
                 'password' => $this->password,
             ]);
-            // throw new InvalidArgumentException('the object of api is null');
         }
         if (empty($queueName)) $queueName = $this->queueName;
         try {

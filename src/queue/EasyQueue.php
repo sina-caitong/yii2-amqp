@@ -3,12 +3,13 @@
 
 namespace pzr\amqp\queue;
 
-use pzr\amqp\MyAmqp;
+use pzr\amqp\Amqp;
+use pzr\amqp\QueueInterface;
 
 /**
  * 队列具体实现
  */
-class EasyQueue extends MyAmqp
+class EasyQueue extends Amqp implements QueueInterface
 {
     public function bind() {
         // 防止队列被篡改

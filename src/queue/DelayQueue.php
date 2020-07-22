@@ -3,14 +3,14 @@
 
 namespace pzr\amqp\queue;
 
-use PhpAmqpLib\Wire\AMQPTable;
 use pzr\amqp\ExchangeType;
-use pzr\amqp\MyAmqp;
+use pzr\amqp\Amqp;
+use pzr\amqp\QueueInterface;
 
 /**
  * 队列具体实现
  */
-class DelayQueue extends MyAmqp
+class DelayQueue extends Amqp implements QueueInterface
 {
 
     /**

@@ -22,7 +22,7 @@ if (!is_file($baseDir . '/vendor/autoload.php')) {
 require $baseDir . '/vendor/autoload.php';
 require $baseDir . '/vendor/yiisoft/yii2/Yii.php';
 
-class MyYii
+class Yii
 {
     private $_application;
     private $_request;

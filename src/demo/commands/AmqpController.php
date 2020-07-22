@@ -5,8 +5,6 @@ namespace app\commands;
 use app\models\CountJob;
 use app\models\RequestJob;
 use pzr\amqp\AmqpBase;
-use pzr\amqp\AmqpJob;
-use pzr\amqp\event\ExecEvent;
 use pzr\amqp\event\PushEvent;
 use Yii;
 use yii\console\Controller;
@@ -78,7 +76,7 @@ class AmqpController extends Controller
                 'count' => $i
             ]);
         }
-        Yii::$app->easyQueue->myPublishBatch($jobs);
+        Yii::$app->easyQueue->publish($jobs);
     }
 
     /**
@@ -97,7 +95,7 @@ class AmqpController extends Controller
                 'count' => $i
             ]);
         }
-        Yii::$app->delayQueue->myPublishBatch($jobs, '07_14_delay.test.');
+        Yii::$app->delayQueue->publish($jobs, '07_14_delay.test.');
     }
 
     /**
@@ -116,7 +114,7 @@ class AmqpController extends Controller
                 'request' => 'request_' . $i,
             ]);
         }
-        $response = Yii::$app->rpcQueue->setQos(10)->myPublishBatch($jobs);
+        $response = Yii::$app->rpcQueue->setQos(10)->publish($jobs);
         return $response;
     }
 
@@ -136,7 +134,7 @@ class AmqpController extends Controller
         /**
          * 既能支持单条又能支持批量
          */
-        $response = Yii::$app->serveQueue->setQos($qos)->setTimeout($timeout)->myPublishBatch($jobs);
+        $response = Yii::$app->serveQueue->setQos($qos)->setTimeout($timeout)->publish($jobs);
         return $response;
     }
 
@@ -148,6 +146,7 @@ class AmqpController extends Controller
     public function actionTestStrict() {
         Yii::$app->easyQueue->on(AmqpBase::EVENT_BEFORE_PUSH, function(PushEvent $event) {
             Yii::$app->easyQueue->bind();   //绑定队列，如果已经绑定可以注释此方法
+            Yii::$app->easyQueue->getApi()->setPolicy();
         });
 
         // 批量发送
@@ -156,7 +155,7 @@ class AmqpController extends Controller
                 'count' => $i
             ]);
         }
-        Yii::$app->easyQueue->myPublishBatch($jobs);
+        Yii::$app->easyQueue->publish($jobs);
     }
 
 }

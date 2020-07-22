@@ -2,9 +2,10 @@
 
 namespace pzr\amqp\queue;
 
-use pzr\amqp\RpcAmqp;
+use pzr\amqp\QueueInterface;
+use pzr\amqp\AmqpRpc;
 
-class RpcQueue extends RpcAmqp
+class RpcQueue extends AmqpRpc implements QueueInterface
 {
 
     public function bind() {

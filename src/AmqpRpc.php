@@ -2,17 +2,14 @@
 
 namespace pzr\amqp;
 
-use Exception;
 use PhpAmqpLib\Message\AMQPMessage;
 use pzr\amqp\event\ExecEvent;
 use pzr\amqp\event\PushEvent;
-use pzr\amqp\exception\InvalidArgumentException;
-use pzr\amqp\exception\UnknowException;
 
 /**
  * 通过AMQP实现RPC调用
  */
-class RpcAmqp extends MyAmqp
+class AmqpRpc extends Amqp
 {
     /** @var string 临时队列名称 */
     private $_callbackQueueName;
@@ -35,7 +32,7 @@ class RpcAmqp extends MyAmqp
      * @param AmqpJob $job 
      * @return void
      */
-    public function push($job, $routingKey = '')
+    public function push($job)
     {
         $this->open();
         $this->trigger(self::EVENT_BEFORE_PUSH, new PushEvent(['job' => $job]));
@@ -62,8 +59,6 @@ class RpcAmqp extends MyAmqp
             while (empty($this->_responses[$corrid])) {
                 $this->channel->wait(null, false, $this->_timeout);
             }
-        } catch (Exception $e) {
-            throw new UnknowException($e->getMessage());
         } finally {
             // 必须是对象才能够返回到请求方，否则会被Yii底层转成int型
             return new Response([
@@ -78,22 +73,21 @@ class RpcAmqp extends MyAmqp
      * @param array $jobs
      * @return void
      */
-    public function myPublishBatch(array $jobs, $routingKey = '')
+    public function publish(array $jobs)
     {
         $this->open();
         if (!is_array($jobs)) {
-            throw new InvalidArgumentException('jobs is not a array');
+            return false;
         }
         $event = new PushEvent(['jobs' => $jobs]);
         $this->trigger(self::EVENT_BEFORE_PUSH, $event);
         // 声明临时队列
         list($this->_callbackQueueName,,) = $this->channel->queue_declare("", false, false, true, false);
         // 批量发送消息
-        if (empty($routingKey)) $routingKey = $this->routingKey;
-        $routingKey = $this->duplicater->getRoutingKey($routingKey, $this->duplicate);
+        $routingKey = $this->duplicater->getRoutingKey($this->routingKey, $this->duplicate);
         foreach ($jobs as $job) {
             if (!($job instanceof AmqpJob)) {
-                throw new InvalidArgumentException('job is not instanceof AmqpJob');
+                continue;
             }
             $this->_corrids[] = $job->getUuid();
             $this->batchBasicPublish($job, $this->exchangeName, $routingKey);
@@ -109,8 +103,6 @@ class RpcAmqp extends MyAmqp
             while (count($this->_corrids) != count($this->_responses)) {
                 $this->channel->wait(null, false, $this->_timeout);
             }
-        } catch (Exception $e) {
-            throw new UnknowException($e->getMessage());
         } finally {
             // 必须是对象才能够返回到请求方，否则会被Yii底层转成int型
             return new Response([
@@ -161,12 +153,6 @@ class RpcAmqp extends MyAmqp
         $callback = function (AMQPMessage $payload) {
             $this->handleMessage($payload);
         };
-
-        /*
-         * prefetch_size 消费者所能接受未确认消息的总体大小
-         * prefetch_count  所能接受最大的未确认条数
-         * a_global
-         */
         $this->channel->basic_qos(null, $qos, null);
         /** 开启自动ack，防止因为消息异常而导致一直无法消费成功 */
         $this->channel->basic_consume($queueName, $consumerTag, false, true, false, false, $callback);
@@ -191,9 +177,7 @@ class RpcAmqp extends MyAmqp
         }
 
         $event = new ExecEvent(['job' => $job]);
-
         $this->trigger(self::EVENT_BEFORE_EXEC, $event);
-
         try {
             $event->result = $event->job->execute();
         } catch (\Exception $error) {

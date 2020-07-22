@@ -12,13 +12,12 @@ class Policy extends AmqpApi
     protected $pattern;
     protected $applyTo;
     protected $definition;
-    protected $apiName = 'policies';
 
     protected $policyConfig;
 
     public function getPolicy()
     {
-        $reqUrl = $this->formatApiUrl($this->apiName, $this->name);
+        $reqUrl = $this->formatApiUrl('policies', $this->name);
         $data = self::$http->request('GET', $reqUrl)->getContent();
         return json_decode($data, true);
     }
