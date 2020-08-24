@@ -1,3 +1,7 @@
+## 说明
+看了AMQP也有很长时间了，一直停留在理论基础上。刚好又想学习Yii框架，那么就以实现AMQP练手吧！  
+所以，这个类包的诞生纯属巧合，也许只是为了练手而已！  
+
 ## 基本用法
 
 引入包(目前处于测试版本)：  
@@ -16,7 +20,7 @@ composer require pzr/amqp:dev-master
 * 支持单条消息发送和批量发送
 * 路由类型支持RabbitMQ的全部类型
 * 启用了RPC队列
-* 可选择队列副本，在启用队列副本后可以选择路由的方式。支持：随机（更多待开发中）
+* 可选择队列副本，在启用队列副本后可以选择路由的方式。支持：随机、轮询、（更多待开发中）
 * 支持多种序列化方式
 
 
@@ -35,7 +39,7 @@ return array(
     ],
     /** 普通消费者 */
     'consumer' => [
-        // 'class' =>  \pzr\amqp\MyAmqp::class,
+        // 'class' =>  \pzr\amqp\Amqp::class,
         'class' =>  \pzr\amqp\AmqpBase::class,
         'host' => '127.0.0.1',
         'port' => 5672,
@@ -205,25 +209,6 @@ class AmqpController extends Controller
 ```shell
 php yii amqp/consumer queueName qos #启动普通消费者
 php yii amqp/rpc-consumer queueName qos #启动RPC消费者
-```
-
-虽然我想对消费者进行更多的封装，比如结合队列副本和消费者的数量等。但是这些都不如利用supervisor管理消费者进程更加有效。在supervisor中配置消费者进程：
-```shell
-; 设置进程的名称，使用 supervisorctl 来管理进程时需要使用该进程名
-[program:queueName]
-; 执行命令的目录
-directory=/your/project/;
-; 执行的命令
-command=/usr/bin/php yii amqp/consumer queueName qos
-; 进程的数量，即消费者的数量。默认是1
-numprocs=3; 
-; 启动进程的用户
-user=root;
-; 程序崩溃时自启动，默认启动的次数为3次
-autorestart=true;
-; 重定向输出日志
-stdout_logfile=/var/log/supervisord/queueName.log
-loglevel=info;
 ```
 
 ### 事件定义

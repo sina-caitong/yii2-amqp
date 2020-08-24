@@ -106,18 +106,17 @@ class Amqp extends AmqpBase
             return false;
         }
 
-        // 放在循环里面是对每一条消息都随机路由，放在循环外则对这一批消息路由
-        $routingKey = $this->duplicater->getRoutingKey($this->routingKey, $this->duplicate);
+        
         foreach ($jobs as $job) {
             if (!($job instanceof JobInterface)) {
                 continue;
             }
+            // 放在循环里面是对每一条消息都随机路由，放在循环外则对这一批消息路由
+            $routingKey = $this->duplicater->getRoutingKey($this->routingKey, $this->duplicate);
             $this->batchBasicPublish($job, $this->exchangeName, $routingKey);
         }
         $event = new PushEvent([
             'jobs' => $jobs,
-            'exchangeName' => $this->exchangeName,
-            'routingKey' => $routingKey,
         ]);
         $this->trigger(self::EVENT_BEFORE_PUSH, $event);
         $this->publishBatch($event->noWait);
@@ -137,7 +136,7 @@ class Amqp extends AmqpBase
      * @inheritDoc
      * @return bool false可以被创建，true不能被创建
      */
-    protected function isQueueCreated($queueName='')
+    public function isQueueCreated($queueName='')
     {
         if (false === $this->strict) return false;
         if ($this->duplicate <= 1) {

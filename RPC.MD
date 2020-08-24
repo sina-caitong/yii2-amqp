@@ -1,7 +1,7 @@
 ## RPC使用
 
 为了能够使用RPC功能，做了如下处理：  
-* 参考Yii Console 的调用方式，实现了 MyYii 对象。
+* 参考Yii Console 的调用方式，实现了 Yii 对象。
 * 客户端发送的请求必须继承 AmqpJob
 
 假设有项目A和项目B，具体使用RPC功能过程：  
@@ -12,7 +12,7 @@
 * 在models目录下编写自己的Job类
 * 在commands下编写自己的Controller类
 * 绑定rpc队列，并且在被调用的项目下启动rpc队列的消费者进程
-* 最后即可在任意处通过 MyYii 调用Controller下的实现方法
+* 最后即可在任意处通过 Yii 调用Controller下的实现方法
 
 情景1：A在 Client 类下希望调用 B 的 Serve 类的方法
 1、在amqp.php 中 配置RPC队列，并且在console.php中引用配置：
@@ -63,7 +63,7 @@ class RpcController extends Controller
     }
 }
 ```
-3、在 Client.php 中通过 MyYii 调用rpc/publish。
+3、在 Client.php 中通过 Yii 调用rpc/publish。
 ```php
 class Client
 {
@@ -71,8 +71,8 @@ class Client
         
         // 不想每次都传config可以试试define('YII_CONSOLE_PATH', '\path')
         $config = require 'console.php';
-        $yii = new MyYii($config);
-        // jobs的申明必须在MyYii之后，因为MyYii引入了一些必要文件。
+        $yii = new Yii($config);
+        // jobs的申明必须在Yii之后，因为Yii引入了一些必要文件。
         $jobs[] = new ServeJob([
             'action' => 'sayHello',
             'params' => ['word'=>'hello world!'],
@@ -115,17 +115,8 @@ php yii amqp/rpc-consumer b_rpc_queue 10
 如果是Composer项目，并且类都是引入的Composer的自动加载函数，那么契合度最高。  
 
 可是在RPC消费者执行时，因为自身项目引入了自己的自动加载函数，而非Composer的autoload。从而导致加载类异常。  
-1、自身项目是有命名空间的，这种情况可以在调用MyYii之前引入自己的autoload.php，也可以修改MyYii引入。  
-2、自身项目没有用命名空间，导致在自动加载类时异常。需要自己处理如何自动加载该类。  
-3、在第2种的情况下，将要实例化的类由于在构造方法中存在其他没有命名空间的对象需要实例化，那么可能再将报错。  
-
-如果是第一种情况，在请求方指定object='\namespace\objectNmae'  
-如果是第二种情况，因为没命名空间，因此需要找到该类的完整路径并且引入才行。  
-
-### RPC消费者因异常而退出的可能
-1、RPC控制器中的异常，因为没有捕获处理导致异常
-
-### A项目对B的RPC调用压测
+1、存在psr*风格的自动加载函数，在请求方指定object='\namespace\objectNmae'  
+2、没有任何命名空间的情况，可以引入项目的底层自动引入函数（具体情况具体分析）  
 
 ### Dagger框架 RPC调用
 Dagger框架比较早，自身也没有引入命名空间，而且在项目中也存在个人写法上引入命名空间。因此需要解决命名空间的问题。  
@@ -162,7 +153,7 @@ class xxx
     protected $yii;
     public function __construct() {
         // ...
-        $yii = new MyYii();
+        $yii = new Yii();
         // RPC调用
         $jobs[] = new MatchLotteryJob([
             'object' => '\model\sellFree\Config',

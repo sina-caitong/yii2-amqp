@@ -1,0 +1,60 @@
+; 公用配置属性
+[common]
+; 也支持按日期分类 %Y-%m-%d
+; %Y 年：2020，也可以写成 %y：20
+; %m 月：08
+; %d 日：07 
+; ../log/%Y-%m/access_%Y-%m-%d.log
+; access_log = ../log/access.log
+access_log = ../log/%Y-%m/access_%Y-%m-%d.log
+error_log = ../log/error.log
+; 可选择：DEBUG,INFO,NOTICE,WARNING,ERROR,CRITICAL,ALERT,EMERGENCY
+; 选中的以逗号隔开，只记录选中的类型日志
+level = info,warning,error
+; 保存AMQP消费者守护进程的PID
+pidfile = /usr/local/var/run/amqp_master.pid
+; 执行ExecDispatcher.php脚本的命令
+command = /usr/local/php5/bin/php
+; \pzr\amqp\cli\Server 启动unix连接的本地文件地址
+unix = /usr/local/var/run/amqp_consumer_serve.sock
+; AMQP消费者读取的连接配置
+[amqp]
+host = 10.71.13.24
+port = 5672
+user = guest
+password = guest
+
+; 进程文件处理：启用beanstalk
+[beanstalk]
+host = 127.0.0.1
+port = 11300
+; error_log =  ../log/beanstalk/error.log
+; access_log = ../log/beanstalk/access.log
+
+; 进程文件处理：启用redis
+[redis]
+host = 127.0.0.1
+port = 6379
+user = 
+password = 
+
+[handler]
+; 可选择：beanstalk、redis、amqp
+; 没有默认的值，所以必须配置一个
+class = redis
+
+; 通知父进程的通信方式
+[pipe]
+[communication]
+; 可选择：redis、amqp、beanstalk、pipe（默认）
+class = pipe
+
+[include]
+files = ./consumer/*.ini
+
+
+; [consumer] 在include指定的路径下配置消费者
+; queueName = 队列名称
+; qos = 1 消费者预处理数
+; duplicate = 2 队列副本数量
+; numpros = 1 消费者进程数量

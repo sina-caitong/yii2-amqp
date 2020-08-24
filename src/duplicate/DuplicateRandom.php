@@ -2,6 +2,9 @@
 
 namespace pzr\amqp\duplicate;
 
+/**
+ * 随机路由方式
+ */
 class DuplicateRandom implements DuplicateInterface
 {
 

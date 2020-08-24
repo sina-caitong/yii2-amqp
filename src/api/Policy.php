@@ -32,7 +32,7 @@ class Policy extends AmqpApi
      */
     public function setPolicy()
     {
-        $reqUrl = $this->formatApiUrl($this->apiName,  $this->name);
+        $reqUrl = $this->formatApiUrl('policies',  $this->name);
         $post = [
             'pattern' => $this->pattern,
             'definition' => $this->definition,

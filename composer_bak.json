@@ -1,0 +1,37 @@
+{
+    "name": "pzr/amqp",
+    "description": "yii-amqp rpc",
+    "keywords":["yii2", "amqp", "rabbitmq", "RPC"],
+    "type":"library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "pengzhengrong",
+            "email": "easysoeasy@163.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "pzr\\amqp\\": "src"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.6.0",
+        "yiisoft/yii2": "~2.0.14",
+        "yiisoft/yii2-bootstrap": "~2.0.0",
+        "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
+        "php-amqplib/php-amqplib": "^2.11",
+        "symfony/http-client": "^4.4",
+        "react/event-loop": "dev-master",
+        "pda/pheanstalk": "~4.0.0",
+        "monolog/monolog": "^2.0@beta",
+        "phpunit/phpunit": "^7.5",
+        "yiisoft/yii2-debug": "~2.1.0"
+    },
+    "require-dev": {
+        "yiisoft/yii2-debug": "~2.1.0",
+        "yiisoft/yii2-faker": "~2.0.0",
+        "yiisoft/yii2-gii": "^2.0@dev"
+    }
+}

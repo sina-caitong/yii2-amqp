@@ -4,4 +4,12 @@
 /src/runtime/
 /src/demo/.DS_Store
 /src/.DS_Store
-
+/runtime/
+/src/cli/log/
+/src/cli/tests/
+/src/cli/config/consumer/*
+/src/cli/config/amqp.ini
+/src/cli/config/process_manager.ini
+/src/demo/models/MyUser.php
+Vendor.php
+/frontend/web/assets/

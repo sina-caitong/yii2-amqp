@@ -107,7 +107,7 @@ class AmqpBase extends Component
     final public function queueDeclare($queueName, $arguments = [])
     {
         if (empty($queueName)) {
-            throw new MissPropertyException('Missing necessary parameters of queueName');
+            throw new InvalidArgumentException('invalid value of: queueName');
         }
         if (!empty($arguments)) {
             // 设置优先级队列
@@ -143,10 +143,10 @@ class AmqpBase extends Component
     final public function exchangeDeclare($exchangeName, $exchangeType, $arguments = [])
     {
         if (empty($exchangeName) || empty($exchangeType)) {
-            throw new MissPropertyException('Missing necessary parameters of exchangeName or exchangeType');
+            throw new InvalidArgumentException('invalid value of: exchangeName or exchangeType');
         }
         if (!ExchangeType::isDefined($exchangeType)) {
-            throw new MissPropertyException('exchangeType\'s value is not defined');
+            throw new InvalidArgumentException('invalid value of: exchangeType');
         }
         if (!empty($arguments)) {
             $arguments = new AMQPTable($arguments);
@@ -173,7 +173,7 @@ class AmqpBase extends Component
     final public function queueBind($queueName, $exchangeName, $routingKey = '', $arguments = [])
     {
         if (empty($queueName) || empty($exchangeName)) {
-            throw new MissPropertyException('Missing necessary parameters: queueName or exchangeName');
+            throw new InvalidArgumentException('invalid value of: queueName or exchangeName');
         }
         if (!empty($arguments)) {
             $arguments = new AMQPTable($arguments);
@@ -307,16 +307,23 @@ class AmqpBase extends Component
         $this->channel->wait_for_pending_acks();
     }
 
+    public function pop($queue, $noAck = true)
+    {
+        $job = $this->channel->basic_get($queue, $noAck);
+        $job = $this->serializer->unserialize($job);
+        return $job;
+    }
+
     /**
      * @param string $queueName
      * @param integer $qos              //每个队列最多未被消费的条数
      * @param string $consumerTag       //消费者的标签
      */
-    public function consume($queueName, $qos = 1, $consumerTag = '')
+    public function consume($queueName, $qos = 1, $consumerTag = '', $noAck = false)
     {
         $this->open();
-        $callback = function (AMQPMessage $payload) {
-            $this->handleMessage($payload);
+        $callback = function (AMQPMessage $payload) use ($noAck) {
+            $this->handleMessage($payload, $noAck);
         };
 
         /*
@@ -325,7 +332,12 @@ class AmqpBase extends Component
          * a_global
          */
         $this->channel->basic_qos(null, $qos, null);
-        $this->channel->basic_consume($queueName, $consumerTag, false, false, false, false, $callback);
+        $this->channel->basic_consume($queueName, $consumerTag, false, $noAck, false, false, $callback);
+
+        register_shutdown_function(function($channel, $connection) {
+            $channel->close();
+            $connection->close();
+        }, $this->channel, $this->connection);
         // Loop as long as the channel has callbacks registered
         while (count($this->channel->callbacks)) {
             $this->channel->wait();
@@ -338,25 +350,22 @@ class AmqpBase extends Component
      * @param AMQPMessage $payload
      * @return ExecEvent
      */
-    public function handleMessage(AMQPMessage $payload)
+    public function handleMessage(AMQPMessage $payload, $noAck)
     {
         $job = $this->serializer->unserialize($payload->getBody());
-
         if (!($job instanceof AmqpJob)) {
-            $payload->nack(false);
+            $noAck ?: $payload->nack(false);
             return false;
         }
 
         $event = new ExecEvent(['job' => $job]);
-
         $this->trigger(self::EVENT_BEFORE_EXEC, $event);
-
         try {
             $event->result = $event->job->execute();
             if ($event->result !== false) {
-                $payload->ack(true);
+                $noAck ?: $payload->ack(true);
             } else {
-                $payload->nack(true, true);
+                $noAck ?: $payload->nack(true, true);
             }
         } catch (\Exception $error) {
             $event->error = $error;
@@ -411,14 +420,7 @@ class AmqpBase extends Component
     protected function isQueueCreated($queueName = '')
     {
         if (false === $this->strict) return false;
-        if (empty($this->api)) {
-            $this->api = new AmqpApi([
-                'vhost' => $this->vhost,
-                'host' => $this->host,
-                'user' => $this->user,
-                'password' => $this->password,
-            ]);
-        }
+        $this->initApi();
         if (empty($queueName)) $queueName = $this->queueName;
         try {
             $info = $this->api->getBinding($queueName);
@@ -430,7 +432,8 @@ class AmqpBase extends Component
         }
     }
 
-    public function setApi($config) {
+    public function setApi($config)
+    {
         if (isset($config['component']) && !empty($config['component'])) {
             $component = $config['component'];
             $this->api = Instance::ensure($component);
@@ -447,10 +450,10 @@ class AmqpBase extends Component
         $config['user'] = $this->user;
         $config['password'] = $this->password;
         $config['host'] = $this->host;
-        $config['port'] = isset($config['port']) ? $config['port'] : 15672;
+        $config['apiPort'] = isset($config['apiPort']) ? $config['apiPort'] : 15672;
         $policyConfig = isset($config['policyConfig']) ? $config['policyConfig'] : [];
         unset($config['policyConfig']);
-        
+
         $api = new $class($config);
         if (!($api instanceof AmqpApi)) {
             throw new InvalidArgumentException('invalid object of: api');
@@ -462,8 +465,44 @@ class AmqpBase extends Component
         $this->api = $api;
     }
 
-    public function getApi() {
+    public function getApi()
+    {
         return $this->api;
+    }
+
+    public function releaseConsumer($queueName)
+    {
+        $this->open();
+        $this->initApi();
+        $info = $this->api->getInfosByQueue($queueName);
+        $consumers = $info['consumer_details'];
+        foreach ($consumers as $c) {
+            $tag = $c->consumer_tag;
+            $this->channel->basic_cancel($tag, true, true);
+        }
+        $this->close();
+    }
+
+    public function releaseConsumerByTag($tag)
+    {
+        $this->open();
+        $this->channel->basic_cancel($tag, true, true);
+        $this->close();
+    }
+
+    protected function initApi(AmqpApi $api = null)
+    {
+        if (!empty($this->api)) return;
+        if ($api instanceof AmqpApi) {
+            $this->api = $api;
+            return;
+        }
+        $this->api = new AmqpApi([
+            'vhost' => $this->vhost,
+            'host' => $this->host,
+            'user' => $this->user,
+            'password' => $this->password,
+        ]);
     }
 
     /**

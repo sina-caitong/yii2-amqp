@@ -2,6 +2,7 @@
 
 namespace pzr\amqp;
 
+use Serializable;
 use yii\base\BaseObject;
 
 class AmqpJob extends BaseObject implements JobInterface
