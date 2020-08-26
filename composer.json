@@ -4,6 +4,7 @@
     "keywords":["yii2", "amqp", "rabbitmq", "RPC"],
     "type":"library",
     "license": "MIT",
+    "version": "1.0.0.0",
     "authors": [
         {
             "name": "pengzhengrong",
