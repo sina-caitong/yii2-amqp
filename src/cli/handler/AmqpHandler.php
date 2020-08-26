@@ -4,8 +4,8 @@ namespace pzr\amqp\cli\handler;
 
 use pzr\amqp\Amqp;
 use pzr\amqp\cli\helper\ProcessHelper;
-use pzr\amqp\cli\logger\Logger;
 use pzr\amqp\event\PushEvent;
+use pzr\amqp\queue\EasyQueue;
 
 class AmqpHandler extends BaseHandler
 {
@@ -15,9 +15,10 @@ class AmqpHandler extends BaseHandler
     {
         parent::__construct($config);
         $config['exchangeName'] = self::QUEUE;
-        $this->amqp = new Amqp($config);
+        $this->amqp = new EasyQueue($config);
         $this->amqp->on(Amqp::EVENT_BEFORE_PUSH, function(PushEvent $event) {
             $event->noWait = true;
+            $this->amqp->bind();
         });
     }
 

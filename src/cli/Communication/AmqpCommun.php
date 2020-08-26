@@ -3,6 +3,8 @@
 namespace pzr\amqp\cli\Communication;
 
 use pzr\amqp\Amqp;
+use pzr\amqp\event\PushEvent;
+use pzr\amqp\queue\EasyQueue;
 
 class AmqpCommun extends BaseCommun
 {
@@ -16,7 +18,11 @@ class AmqpCommun extends BaseCommun
         parent::__construct($config);
         $config['queueName'] = self::PIPE;
         $config['exchangeName'] = self::PIPE;
-        $this->amqp = new Amqp($config);
+        $this->amqp = new EasyQueue($config);
+        $this->amqp->on(Amqp::EVENT_BEFORE_PUSH, function (PushEvent $event) {
+            $event->noWait = true;
+            $this->amqp->bind();
+        });
     }
 
     public function open()
@@ -29,7 +35,8 @@ class AmqpCommun extends BaseCommun
         return true;
     }
 
-    public function prepareRead() {
+    public function prepareRead()
+    {
         return true;
     }
 
@@ -40,7 +47,7 @@ class AmqpCommun extends BaseCommun
             $job = $this->amqp->pop(self::PIPE);
             if (empty($job)) break;
             $array[] = $job->execute();
-        } while(true);
+        } while (true);
         $this->logger->addLog(sprintf("[amqp] read buffer: %s", json_encode($array)));
         return $array;
     }
@@ -62,7 +69,7 @@ class AmqpCommun extends BaseCommun
             list($queueName, $program) = $a;
             if (empty($queueName) || empty($program)) continue;
             $jobs[] = new CommunJob([$queueName, $program]);
-            $string[] = $queueName.','.$program;
+            $string[] = $queueName . ',' . $program;
         }
         if (empty($jobs)) return false;
         $this->amqp->publish($jobs);
@@ -72,6 +79,5 @@ class AmqpCommun extends BaseCommun
 
     public function flush()
     {
-        
     }
 }
