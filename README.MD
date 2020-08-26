@@ -209,16 +209,8 @@ php yii amqp/rpc-consumer queueName qos #启动RPC消费者
 
 ### 消费者进程管理web界面
 > 一般情况下推荐使用Supervisor管理消费者进程，但是为了更好的贴切本项目的消费者进程管理，我也尝试的做了一个管理。
-> 先来贴一些图吧！
-
-首先需要登入：
-![PHP](https://cdn.learnku.com/uploads/images/202008/26/68165/PuzyKNJygR.png!large)
-然后进入首页：
+> 支持日志跟踪、AMQP消费者的连接管理和登入功能，只看看首页吧！
 ![PHP](https://cdn.learnku.com/uploads/images/202008/26/68165/VbpoiRuNwX.png!large)
-点击Tag可以看见消费者的连接情况：
-![PHP](https://cdn.learnku.com/uploads/images/202008/26/68165/sLckspTpfE.png!large)
-点击Logger可以监控日志：
-![PHP](https://cdn.learnku.com/uploads/images/202008/26/68165/yKcHdngxWp.png!large)
 
 ### 事件定义
 | 事件 | 介绍 | 用法 |
