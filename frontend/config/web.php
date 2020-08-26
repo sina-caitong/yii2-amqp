@@ -1,7 +1,5 @@
 <?php
 
-use yii\base\Request;
-
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
@@ -32,7 +30,8 @@ $config = [
             'class' => 'yii\caching\FileCache',
         ],
         'user' => [
-            'identityClass' => class_exists('app\models\MyUser') ? 'app\models\MyUser' : 'app\models\User',
+            'identityClass' => is_file(dirname(__DIR__).'/models/MyUser.php') ? 'app\models\MyUser' : 'app\models\User',
+            // 'identityClass' => 'app\models\MyUser',
             'enableAutoLogin' => true,
         ],
         'errorHandler' => [

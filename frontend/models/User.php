@@ -14,14 +14,16 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
         '100' => [
             'id' => '100',
             'username' => 'admin',
-            'password' => 'admin',
+            // 生成好的MD5值
+            'password' => '',
             'authKey' => 'test100key',
             'accessToken' => '100-token',
         ],
         '101' => [
             'id' => '101',
             'username' => 'demo',
-            'password' => 'demo',
+            // 生成好的MD5值
+            'password' => '',
             'authKey' => 'test101key',
             'accessToken' => '101-token',
         ],

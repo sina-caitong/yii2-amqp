@@ -79,7 +79,7 @@ class LoginForm extends Model
         if ($this->_user === false) {
 
             $this->_user = class_exists(MyUser::class) ? MyUser::findByUsername($this->username)
-                : User::findByUsername($this->username);
+                : MyUser::findByUsername($this->username);
         }
         return $this->_user;
     }

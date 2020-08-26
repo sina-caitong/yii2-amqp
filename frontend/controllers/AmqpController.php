@@ -31,7 +31,7 @@ class AmqpController extends Controller
      */
     public function actionIndex()
     {
-        $flag = $this->auth();
+        $this->auth();
         $model = new AmqpForm();
         return $this->render('/amqp/index', [
             'model' => $model
@@ -131,7 +131,6 @@ class AmqpController extends Controller
         if (!isset($_SESSION['username'])) {
             unset($_SESSION['username']);
             $this->redirect('index.php?r=amqp/login');
-            exit(0);
         }
         return true;
     }
