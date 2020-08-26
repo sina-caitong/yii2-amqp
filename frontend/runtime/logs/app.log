@@ -16687,3 +16687,937 @@ $_SERVER = [
     'REQUEST_TIME_FLOAT' => 1598410673.9205
     'REQUEST_TIME' => 1598410673
 ]
+2020-08-26 05:33:02 [-][-][-][error][PhpAmqpLib\Exception\AMQPConnectionClosedException] PhpAmqpLib\Exception\AMQPConnectionClosedException: CONNECTION_FORCED - delete by AMQP MANAGER(0, 0) in /Users/pzr/myProject/public/yii2-amqp/vendor/php-amqplib/php-amqplib/PhpAmqpLib/Connection/AbstractConnection.php:745
+Stack trace:
+#0 [internal function]: PhpAmqpLib\Connection\AbstractConnection->connection_close(Object(PhpAmqpLib\Wire\AMQPReader))
+#1 /Users/pzr/myProject/public/yii2-amqp/vendor/php-amqplib/php-amqplib/PhpAmqpLib/Channel/AbstractChannel.php(216): call_user_func(Array, Object(PhpAmqpLib\Wire\AMQPReader))
+#2 /Users/pzr/myProject/public/yii2-amqp/vendor/php-amqplib/php-amqplib/PhpAmqpLib/Channel/AbstractChannel.php(374): PhpAmqpLib\Channel\AbstractChannel->dispatch('10,50', '\x01@*CONNECTION_F...', NULL)
+#3 /Users/pzr/myProject/public/yii2-amqp/vendor/php-amqplib/php-amqplib/PhpAmqpLib/Connection/AbstractConnection.php(666): PhpAmqpLib\Channel\AbstractChannel->wait()
+#4 /Users/pzr/myProject/public/yii2-amqp/vendor/php-amqplib/php-amqplib/PhpAmqpLib/Channel/AbstractChannel.php(234): PhpAmqpLib\Connection\AbstractConnection->wait_channel(1, 0)
+#5 /Users/pzr/myProject/public/yii2-amqp/vendor/php-amqplib/php-amqplib/PhpAmqpLib/Channel/AbstractChannel.php(352): PhpAmqpLib\Channel\AbstractChannel->next_frame(0)
+#6 /Users/pzr/myProject/public/yii2-amqp/src/AmqpBase.php(343): PhpAmqpLib\Channel\AbstractChannel->wait()
+#7 /Users/pzr/myProject/public/yii2-amqp/frontend/commands/AmqpController.php(33): pzr\amqp\AmqpBase->consume('07_15_easy_queu...', '1', '')
+#8 [internal function]: app\commands\AmqpController->actionConsumer('07_15_easy_queu...', '1', '')
+#9 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/InlineAction.php(57): call_user_func_array(Array, Array)
+#10 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/Controller.php(180): yii\base\InlineAction->runWithParams(Array)
+#11 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/console/Controller.php(179): yii\base\Controller->runAction('consumer', Array)
+#12 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/Module.php(528): yii\console\Controller->runAction('consumer', Array)
+#13 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/console/Application.php(180): yii\base\Module->runAction('amqp/consumer', Array)
+#14 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/console/Application.php(147): yii\console\Application->runAction('amqp/consumer', Array)
+#15 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/Application.php(386): yii\console\Application->handleRequest(Object(yii\console\Request))
+#16 /Users/pzr/myProject/public/yii2-amqp/frontend/yii(21): yii\base\Application->run()
+#17 {main}
+2020-08-26 05:29:24 [-][-][-][info][application] $_GET = []
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = []
+
+$_SERVER = [
+    'TERM' => 'xterm-256color'
+    'LC_ALL' => 'zh_CN.UTF-8'
+    'SSH_AUTH_SOCK' => '/private/tmp/com.apple.launchd.7v4vmumCCO/Listeners'
+    '__CF_USER_TEXT_ENCODING' => '0x0:25:52'
+    'PATH' => '/usr/local/opt/openssl@1.1/bin:/usr/local/bin:/Users/pzr/.rbenv/bin:/usr/local/php5/bin:./usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/usr/local/opt/openssl@1.1/bin:/Users/pzr/.rbenv/bin:/usr/local/php5/bin:./usr/local/bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home/bin:/usr/bin/svn:/Users/pzr/opt/apache-maven-3.3.3/bin:/Users/pzr/opt/autoconf-2.69/bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home/bin:/usr/bin/svn:/Users/pzr/opt/apache-maven-3.3.3/bin:/Users/pzr/opt/autoconf-2.69/bin'
+    'LANG' => 'zh_CN.UTF-8'
+    'HOME' => '/Users/pzr'
+    'COLORTERM' => 'truecolor'
+    'MAIL' => '/var/mail/root'
+    'LOGNAME' => 'root'
+    'USER' => 'root'
+    'SHELL' => '/bin/sh'
+    'SUDO_COMMAND' => '/usr/local/bin/supervisord -c /etc/supervisord.conf'
+    'SUDO_USER' => 'pzr'
+    'SUDO_UID' => '501'
+    'SUDO_GID' => '20'
+    'SUPERVISOR_ENABLED' => '1'
+    'SUPERVISOR_SERVER_URL' => 'unix:///var/run/supervisor.sock'
+    'SUPERVISOR_PROCESS_NAME' => 'amqpServer'
+    'SUPERVISOR_GROUP_NAME' => 'amqpServer'
+    'PHP_SELF' => '/Users/pzr/myProject/public/yii2-amqp/frontend/yii'
+    'SCRIPT_NAME' => '/Users/pzr/myProject/public/yii2-amqp/frontend/yii'
+    'SCRIPT_FILENAME' => '/Users/pzr/myProject/public/yii2-amqp/frontend/yii'
+    'PATH_TRANSLATED' => '/Users/pzr/myProject/public/yii2-amqp/frontend/yii'
+    'DOCUMENT_ROOT' => ''
+    'REQUEST_TIME_FLOAT' => 1598412564.053
+    'REQUEST_TIME' => 1598412564
+    'argv' => [
+        0 => '/Users/pzr/myProject/public/yii2-amqp/frontend/yii'
+        1 => 'amqp/consumer'
+        2 => '07_15_easy_queue'
+        3 => '1'
+    ]
+    'argc' => 4
+]
+2020-08-26 05:41:34 [127.0.0.1][-][-][error][yii\base\ErrorException:8] yii\base\ErrorException: Undefined variable: _SESSION in /Users/pzr/myProject/public/yii2-amqp/frontend/controllers/AmqpController.php:132
+Stack trace:
+#0 /Users/pzr/myProject/public/yii2-amqp/frontend/controllers/AmqpController.php(132): yii\base\ErrorHandler->handleError()
+#1 /Users/pzr/myProject/public/yii2-amqp/frontend/controllers/AmqpController.php(33): app\controllers\AmqpController->auth()
+#2 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/InlineAction.php(57): app\controllers\AmqpController->actionIndex()
+#3 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/InlineAction.php(57): ::call_user_func_array:{/Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/InlineAction.php:57}()
+#4 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/Controller.php(180): yii\base\InlineAction->runWithParams()
+#5 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/Module.php(528): yii\base\Controller->runAction()
+#6 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/web/Application.php(103): yii\base\Module->runAction()
+#7 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/Application.php(386): yii\web\Application->handleRequest()
+#8 /Users/pzr/myProject/public/yii2-amqp/frontend/web/index.php(14): yii\base\Application->run()
+#9 {main}
+2020-08-26 05:41:34 [127.0.0.1][-][-][info][application] $_GET = []
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    'PHPSESSID' => '31b53bln7c49c6jeghq4n840g9'
+    '_identity' => 'd1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa:2:{i:0;s:9:\"_identity\";i:1;s:28:\"[\"101\",\"test101key\",2592000]\";}'
+    '_csrf' => 'ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a:2:{i:0;s:5:\"_csrf\";i:1;s:32:\"Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5\";}'
+]
+
+$_SERVER = [
+    'USER' => '_www'
+    'HOME' => '/Library/WebServer'
+    'HTTP_COOKIE' => 'PHPSESSID=31b53bln7c49c6jeghq4n840g9; _identity=d1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa%3A2%3A%7Bi%3A0%3Bs%3A9%3A%22_identity%22%3Bi%3A1%3Bs%3A28%3A%22%5B%22101%22%2C%22test101key%22%2C2592000%5D%22%3B%7D; _csrf=ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5%22%3B%7D'
+    'HTTP_ACCEPT_LANGUAGE' => 'zh-CN,zh;q=0.9,en;q=0.8'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_DNT' => '1'
+    'HTTP_CACHE_CONTROL' => 'max-age=0'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_HOST' => 'yii2-amqp'
+    'SCRIPT_FILENAME' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web/index.php'
+    'REDIRECT_STATUS' => '200'
+    'SERVER_NAME' => 'yii2-amqp'
+    'SERVER_PORT' => '80'
+    'SERVER_ADDR' => '127.0.0.1'
+    'REMOTE_PORT' => '61364'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'SERVER_SOFTWARE' => 'nginx/1.19.1'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'REQUEST_SCHEME' => 'http'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'DOCUMENT_ROOT' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web'
+    'DOCUMENT_URI' => '/index.php'
+    'REQUEST_URI' => '/index.php'
+    'SCRIPT_NAME' => '/index.php'
+    'CONTENT_LENGTH' => ''
+    'CONTENT_TYPE' => ''
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'FCGI_ROLE' => 'RESPONDER'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1598413294.907
+    'REQUEST_TIME' => 1598413294
+]
+2020-08-26 05:41:36 [127.0.0.1][-][-][error][yii\base\ErrorException:8] yii\base\ErrorException: Undefined variable: _SESSION in /Users/pzr/myProject/public/yii2-amqp/frontend/controllers/AmqpController.php:132
+Stack trace:
+#0 /Users/pzr/myProject/public/yii2-amqp/frontend/controllers/AmqpController.php(132): yii\base\ErrorHandler->handleError()
+#1 /Users/pzr/myProject/public/yii2-amqp/frontend/controllers/AmqpController.php(33): app\controllers\AmqpController->auth()
+#2 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/InlineAction.php(57): app\controllers\AmqpController->actionIndex()
+#3 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/InlineAction.php(57): ::call_user_func_array:{/Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/InlineAction.php:57}()
+#4 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/Controller.php(180): yii\base\InlineAction->runWithParams()
+#5 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/Module.php(528): yii\base\Controller->runAction()
+#6 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/web/Application.php(103): yii\base\Module->runAction()
+#7 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/Application.php(386): yii\web\Application->handleRequest()
+#8 /Users/pzr/myProject/public/yii2-amqp/frontend/web/index.php(14): yii\base\Application->run()
+#9 {main}
+2020-08-26 05:41:36 [127.0.0.1][-][-][info][application] $_GET = []
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    'PHPSESSID' => '31b53bln7c49c6jeghq4n840g9'
+    '_identity' => 'd1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa:2:{i:0;s:9:\"_identity\";i:1;s:28:\"[\"101\",\"test101key\",2592000]\";}'
+    '_csrf' => 'ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a:2:{i:0;s:5:\"_csrf\";i:1;s:32:\"Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5\";}'
+]
+
+$_SERVER = [
+    'USER' => '_www'
+    'HOME' => '/Library/WebServer'
+    'HTTP_COOKIE' => 'PHPSESSID=31b53bln7c49c6jeghq4n840g9; _identity=d1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa%3A2%3A%7Bi%3A0%3Bs%3A9%3A%22_identity%22%3Bi%3A1%3Bs%3A28%3A%22%5B%22101%22%2C%22test101key%22%2C2592000%5D%22%3B%7D; _csrf=ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5%22%3B%7D'
+    'HTTP_ACCEPT_LANGUAGE' => 'zh-CN,zh;q=0.9,en;q=0.8'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_DNT' => '1'
+    'HTTP_CACHE_CONTROL' => 'max-age=0'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_HOST' => 'yii2-amqp'
+    'SCRIPT_FILENAME' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web/index.php'
+    'REDIRECT_STATUS' => '200'
+    'SERVER_NAME' => 'yii2-amqp'
+    'SERVER_PORT' => '80'
+    'SERVER_ADDR' => '127.0.0.1'
+    'REMOTE_PORT' => '61367'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'SERVER_SOFTWARE' => 'nginx/1.19.1'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'REQUEST_SCHEME' => 'http'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'DOCUMENT_ROOT' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web'
+    'DOCUMENT_URI' => '/index.php'
+    'REQUEST_URI' => '/index.php'
+    'SCRIPT_NAME' => '/index.php'
+    'CONTENT_LENGTH' => ''
+    'CONTENT_TYPE' => ''
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'FCGI_ROLE' => 'RESPONDER'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1598413296.3511
+    'REQUEST_TIME' => 1598413296
+]
+2020-08-26 05:42:26 [127.0.0.1][101][-][warning][yii\web\Session::init] Session is already started
+2020-08-26 05:42:26 [127.0.0.1][101][-][info][application] $_GET = []
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    'PHPSESSID' => '31b53bln7c49c6jeghq4n840g9'
+    '_identity' => 'd1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa:2:{i:0;s:9:\"_identity\";i:1;s:28:\"[\"101\",\"test101key\",2592000]\";}'
+    '_csrf' => 'ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a:2:{i:0;s:5:\"_csrf\";i:1;s:32:\"Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5\";}'
+]
+
+$_SESSION = [
+    '__flash' => []
+    'username' => 'pengzr'
+    '__id' => '101'
+]
+
+$_SERVER = [
+    'USER' => '_www'
+    'HOME' => '/Library/WebServer'
+    'HTTP_COOKIE' => 'PHPSESSID=31b53bln7c49c6jeghq4n840g9; _identity=d1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa%3A2%3A%7Bi%3A0%3Bs%3A9%3A%22_identity%22%3Bi%3A1%3Bs%3A28%3A%22%5B%22101%22%2C%22test101key%22%2C2592000%5D%22%3B%7D; _csrf=ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5%22%3B%7D'
+    'HTTP_ACCEPT_LANGUAGE' => 'zh-CN,zh;q=0.9,en;q=0.8'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_DNT' => '1'
+    'HTTP_CACHE_CONTROL' => 'max-age=0'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_HOST' => 'yii2-amqp'
+    'SCRIPT_FILENAME' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web/index.php'
+    'REDIRECT_STATUS' => '200'
+    'SERVER_NAME' => 'yii2-amqp'
+    'SERVER_PORT' => '80'
+    'SERVER_ADDR' => '127.0.0.1'
+    'REMOTE_PORT' => '61383'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'SERVER_SOFTWARE' => 'nginx/1.19.1'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'REQUEST_SCHEME' => 'http'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'DOCUMENT_ROOT' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web'
+    'DOCUMENT_URI' => '/index.php'
+    'REQUEST_URI' => '/index.php'
+    'SCRIPT_NAME' => '/index.php'
+    'CONTENT_LENGTH' => ''
+    'CONTENT_TYPE' => ''
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'FCGI_ROLE' => 'RESPONDER'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1598413346.2586
+    'REQUEST_TIME' => 1598413346
+]
+2020-08-26 05:42:29 [127.0.0.1][101][-][warning][yii\web\Session::init] Session is already started
+2020-08-26 05:42:29 [127.0.0.1][101][-][info][application] $_GET = [
+    'r' => 'amqp/stat'
+]
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    'PHPSESSID' => '31b53bln7c49c6jeghq4n840g9'
+    '_identity' => 'd1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa:2:{i:0;s:9:\"_identity\";i:1;s:28:\"[\"101\",\"test101key\",2592000]\";}'
+    '_csrf' => 'ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a:2:{i:0;s:5:\"_csrf\";i:1;s:32:\"Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5\";}'
+]
+
+$_SESSION = [
+    '__flash' => []
+    'username' => 'pengzr'
+    '__id' => '101'
+]
+
+$_SERVER = [
+    'USER' => '_www'
+    'HOME' => '/Library/WebServer'
+    'HTTP_COOKIE' => 'PHPSESSID=31b53bln7c49c6jeghq4n840g9; _identity=d1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa%3A2%3A%7Bi%3A0%3Bs%3A9%3A%22_identity%22%3Bi%3A1%3Bs%3A28%3A%22%5B%22101%22%2C%22test101key%22%2C2592000%5D%22%3B%7D; _csrf=ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5%22%3B%7D'
+    'HTTP_ACCEPT_LANGUAGE' => 'zh-CN,zh;q=0.9,en;q=0.8'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate'
+    'HTTP_REFERER' => 'http://yii2-amqp/index.php'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'
+    'HTTP_DNT' => '1'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_HOST' => 'yii2-amqp'
+    'SCRIPT_FILENAME' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web/index.php'
+    'REDIRECT_STATUS' => '200'
+    'SERVER_NAME' => 'yii2-amqp'
+    'SERVER_PORT' => '80'
+    'SERVER_ADDR' => '127.0.0.1'
+    'REMOTE_PORT' => '61386'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'SERVER_SOFTWARE' => 'nginx/1.19.1'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'REQUEST_SCHEME' => 'http'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'DOCUMENT_ROOT' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web'
+    'DOCUMENT_URI' => '/index.php'
+    'REQUEST_URI' => '/index.php?r=amqp%2Fstat'
+    'SCRIPT_NAME' => '/index.php'
+    'CONTENT_LENGTH' => ''
+    'CONTENT_TYPE' => ''
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => 'r=amqp%2Fstat'
+    'FCGI_ROLE' => 'RESPONDER'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1598413349.3977
+    'REQUEST_TIME' => 1598413349
+]
+2020-08-26 05:42:30 [127.0.0.1][101][-][warning][yii\web\Session::init] Session is already started
+2020-08-26 05:42:30 [127.0.0.1][101][-][info][application] $_GET = [
+    'r' => 'amqp/index'
+]
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    'PHPSESSID' => '31b53bln7c49c6jeghq4n840g9'
+    '_identity' => 'd1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa:2:{i:0;s:9:\"_identity\";i:1;s:28:\"[\"101\",\"test101key\",2592000]\";}'
+    '_csrf' => 'ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a:2:{i:0;s:5:\"_csrf\";i:1;s:32:\"Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5\";}'
+]
+
+$_SESSION = [
+    '__flash' => []
+    'username' => 'pengzr'
+    '__id' => '101'
+]
+
+$_SERVER = [
+    'USER' => '_www'
+    'HOME' => '/Library/WebServer'
+    'HTTP_COOKIE' => 'PHPSESSID=31b53bln7c49c6jeghq4n840g9; _identity=d1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa%3A2%3A%7Bi%3A0%3Bs%3A9%3A%22_identity%22%3Bi%3A1%3Bs%3A28%3A%22%5B%22101%22%2C%22test101key%22%2C2592000%5D%22%3B%7D; _csrf=ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5%22%3B%7D'
+    'HTTP_ACCEPT_LANGUAGE' => 'zh-CN,zh;q=0.9,en;q=0.8'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate'
+    'HTTP_REFERER' => 'http://yii2-amqp/index.php?r=amqp%2Fstat'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'
+    'HTTP_DNT' => '1'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_HOST' => 'yii2-amqp'
+    'SCRIPT_FILENAME' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web/index.php'
+    'REDIRECT_STATUS' => '200'
+    'SERVER_NAME' => 'yii2-amqp'
+    'SERVER_PORT' => '80'
+    'SERVER_ADDR' => '127.0.0.1'
+    'REMOTE_PORT' => '61387'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'SERVER_SOFTWARE' => 'nginx/1.19.1'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'REQUEST_SCHEME' => 'http'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'DOCUMENT_ROOT' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web'
+    'DOCUMENT_URI' => '/index.php'
+    'REQUEST_URI' => '/index.php?r=amqp%2Findex'
+    'SCRIPT_NAME' => '/index.php'
+    'CONTENT_LENGTH' => ''
+    'CONTENT_TYPE' => ''
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => 'r=amqp%2Findex'
+    'FCGI_ROLE' => 'RESPONDER'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1598413350.8483
+    'REQUEST_TIME' => 1598413350
+]
+2020-08-26 05:42:42 [127.0.0.1][101][-][warning][yii\web\Session::init] Session is already started
+2020-08-26 05:42:42 [127.0.0.1][101][-][info][application] $_GET = []
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    'PHPSESSID' => '31b53bln7c49c6jeghq4n840g9'
+    '_identity' => 'd1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa:2:{i:0;s:9:\"_identity\";i:1;s:28:\"[\"101\",\"test101key\",2592000]\";}'
+    '_csrf' => 'ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a:2:{i:0;s:5:\"_csrf\";i:1;s:32:\"Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5\";}'
+]
+
+$_SESSION = [
+    '__flash' => []
+    'username' => 'pengzr'
+    '__id' => '101'
+]
+
+$_SERVER = [
+    'USER' => '_www'
+    'HOME' => '/Library/WebServer'
+    'HTTP_COOKIE' => 'PHPSESSID=31b53bln7c49c6jeghq4n840g9; _identity=d1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa%3A2%3A%7Bi%3A0%3Bs%3A9%3A%22_identity%22%3Bi%3A1%3Bs%3A28%3A%22%5B%22101%22%2C%22test101key%22%2C2592000%5D%22%3B%7D; _csrf=ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5%22%3B%7D'
+    'HTTP_ACCEPT_LANGUAGE' => 'zh-CN,zh;q=0.9,en;q=0.8'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate'
+    'HTTP_REFERER' => 'http://yii2-amqp/index.php?r=amqp%2Findex'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'
+    'HTTP_DNT' => '1'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_HOST' => 'yii2-amqp'
+    'SCRIPT_FILENAME' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web/index.php'
+    'REDIRECT_STATUS' => '200'
+    'SERVER_NAME' => 'yii2-amqp'
+    'SERVER_PORT' => '80'
+    'SERVER_ADDR' => '127.0.0.1'
+    'REMOTE_PORT' => '61392'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'SERVER_SOFTWARE' => 'nginx/1.19.1'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'REQUEST_SCHEME' => 'http'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'DOCUMENT_ROOT' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web'
+    'DOCUMENT_URI' => '/index.php'
+    'REQUEST_URI' => '/index.php'
+    'SCRIPT_NAME' => '/index.php'
+    'CONTENT_LENGTH' => ''
+    'CONTENT_TYPE' => ''
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'FCGI_ROLE' => 'RESPONDER'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1598413362.6453
+    'REQUEST_TIME' => 1598413362
+]
+2020-08-26 05:45:19 [127.0.0.1][101][-][warning][yii\web\Session::init] Session is already started
+2020-08-26 05:45:19 [127.0.0.1][101][-][info][application] $_GET = []
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    'PHPSESSID' => '31b53bln7c49c6jeghq4n840g9'
+    '_identity' => 'd1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa:2:{i:0;s:9:\"_identity\";i:1;s:28:\"[\"101\",\"test101key\",2592000]\";}'
+    '_csrf' => 'ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a:2:{i:0;s:5:\"_csrf\";i:1;s:32:\"Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5\";}'
+]
+
+$_SESSION = [
+    '__flash' => []
+    'username' => 'pengzr'
+    '__id' => '101'
+]
+
+$_SERVER = [
+    'USER' => '_www'
+    'HOME' => '/Library/WebServer'
+    'HTTP_COOKIE' => 'PHPSESSID=31b53bln7c49c6jeghq4n840g9; _identity=d1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa%3A2%3A%7Bi%3A0%3Bs%3A9%3A%22_identity%22%3Bi%3A1%3Bs%3A28%3A%22%5B%22101%22%2C%22test101key%22%2C2592000%5D%22%3B%7D; _csrf=ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5%22%3B%7D'
+    'HTTP_ACCEPT_LANGUAGE' => 'zh-CN,zh;q=0.9,en;q=0.8'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate'
+    'HTTP_REFERER' => 'http://yii2-amqp/index.php?r=amqp%2Findex'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_DNT' => '1'
+    'HTTP_CACHE_CONTROL' => 'max-age=0'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_HOST' => 'yii2-amqp'
+    'SCRIPT_FILENAME' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web/index.php'
+    'REDIRECT_STATUS' => '200'
+    'SERVER_NAME' => 'yii2-amqp'
+    'SERVER_PORT' => '80'
+    'SERVER_ADDR' => '127.0.0.1'
+    'REMOTE_PORT' => '61436'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'SERVER_SOFTWARE' => 'nginx/1.19.1'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'REQUEST_SCHEME' => 'http'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'DOCUMENT_ROOT' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web'
+    'DOCUMENT_URI' => '/index.php'
+    'REQUEST_URI' => '/index.php'
+    'SCRIPT_NAME' => '/index.php'
+    'CONTENT_LENGTH' => ''
+    'CONTENT_TYPE' => ''
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'FCGI_ROLE' => 'RESPONDER'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1598413519.7206
+    'REQUEST_TIME' => 1598413519
+]
+2020-08-26 05:45:21 [127.0.0.1][101][-][warning][yii\web\Session::init] Session is already started
+2020-08-26 05:45:21 [127.0.0.1][101][-][info][application] $_GET = []
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    'PHPSESSID' => '31b53bln7c49c6jeghq4n840g9'
+    '_identity' => 'd1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa:2:{i:0;s:9:\"_identity\";i:1;s:28:\"[\"101\",\"test101key\",2592000]\";}'
+    '_csrf' => 'ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a:2:{i:0;s:5:\"_csrf\";i:1;s:32:\"Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5\";}'
+]
+
+$_SESSION = [
+    '__flash' => []
+    'username' => 'pengzr'
+    '__id' => '101'
+]
+
+$_SERVER = [
+    'USER' => '_www'
+    'HOME' => '/Library/WebServer'
+    'HTTP_COOKIE' => 'PHPSESSID=31b53bln7c49c6jeghq4n840g9; _identity=d1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa%3A2%3A%7Bi%3A0%3Bs%3A9%3A%22_identity%22%3Bi%3A1%3Bs%3A28%3A%22%5B%22101%22%2C%22test101key%22%2C2592000%5D%22%3B%7D; _csrf=ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5%22%3B%7D'
+    'HTTP_ACCEPT_LANGUAGE' => 'zh-CN,zh;q=0.9,en;q=0.8'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate'
+    'HTTP_REFERER' => 'http://yii2-amqp/index.php?r=amqp%2Findex'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_DNT' => '1'
+    'HTTP_CACHE_CONTROL' => 'max-age=0'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_HOST' => 'yii2-amqp'
+    'SCRIPT_FILENAME' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web/index.php'
+    'REDIRECT_STATUS' => '200'
+    'SERVER_NAME' => 'yii2-amqp'
+    'SERVER_PORT' => '80'
+    'SERVER_ADDR' => '127.0.0.1'
+    'REMOTE_PORT' => '61440'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'SERVER_SOFTWARE' => 'nginx/1.19.1'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'REQUEST_SCHEME' => 'http'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'DOCUMENT_ROOT' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web'
+    'DOCUMENT_URI' => '/index.php'
+    'REQUEST_URI' => '/index.php'
+    'SCRIPT_NAME' => '/index.php'
+    'CONTENT_LENGTH' => ''
+    'CONTENT_TYPE' => ''
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'FCGI_ROLE' => 'RESPONDER'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1598413521.4689
+    'REQUEST_TIME' => 1598413521
+]
+2020-08-26 05:45:23 [127.0.0.1][101][-][warning][yii\web\Session::init] Session is already started
+2020-08-26 05:45:23 [127.0.0.1][101][-][info][application] $_GET = []
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    'PHPSESSID' => '31b53bln7c49c6jeghq4n840g9'
+    '_identity' => 'd1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa:2:{i:0;s:9:\"_identity\";i:1;s:28:\"[\"101\",\"test101key\",2592000]\";}'
+    '_csrf' => 'ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a:2:{i:0;s:5:\"_csrf\";i:1;s:32:\"Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5\";}'
+]
+
+$_SESSION = [
+    '__flash' => []
+    'username' => 'pengzr'
+    '__id' => '101'
+]
+
+$_SERVER = [
+    'USER' => '_www'
+    'HOME' => '/Library/WebServer'
+    'HTTP_COOKIE' => 'PHPSESSID=31b53bln7c49c6jeghq4n840g9; _identity=d1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa%3A2%3A%7Bi%3A0%3Bs%3A9%3A%22_identity%22%3Bi%3A1%3Bs%3A28%3A%22%5B%22101%22%2C%22test101key%22%2C2592000%5D%22%3B%7D; _csrf=ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5%22%3B%7D'
+    'HTTP_ACCEPT_LANGUAGE' => 'zh-CN,zh;q=0.9,en;q=0.8'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate'
+    'HTTP_REFERER' => 'http://yii2-amqp/index.php?r=amqp%2Findex'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_DNT' => '1'
+    'HTTP_CACHE_CONTROL' => 'max-age=0'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_HOST' => 'yii2-amqp'
+    'SCRIPT_FILENAME' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web/index.php'
+    'REDIRECT_STATUS' => '200'
+    'SERVER_NAME' => 'yii2-amqp'
+    'SERVER_PORT' => '80'
+    'SERVER_ADDR' => '127.0.0.1'
+    'REMOTE_PORT' => '61443'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'SERVER_SOFTWARE' => 'nginx/1.19.1'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'REQUEST_SCHEME' => 'http'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'DOCUMENT_ROOT' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web'
+    'DOCUMENT_URI' => '/index.php'
+    'REQUEST_URI' => '/index.php'
+    'SCRIPT_NAME' => '/index.php'
+    'CONTENT_LENGTH' => ''
+    'CONTENT_TYPE' => ''
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'FCGI_ROLE' => 'RESPONDER'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1598413523.8916
+    'REQUEST_TIME' => 1598413523
+]
+2020-08-26 05:45:24 [127.0.0.1][101][-][warning][yii\web\Session::init] Session is already started
+2020-08-26 05:45:24 [127.0.0.1][101][-][info][application] $_GET = []
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    'PHPSESSID' => '31b53bln7c49c6jeghq4n840g9'
+    '_identity' => 'd1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa:2:{i:0;s:9:\"_identity\";i:1;s:28:\"[\"101\",\"test101key\",2592000]\";}'
+    '_csrf' => 'ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a:2:{i:0;s:5:\"_csrf\";i:1;s:32:\"Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5\";}'
+]
+
+$_SESSION = [
+    '__flash' => []
+    'username' => 'pengzr'
+    '__id' => '101'
+]
+
+$_SERVER = [
+    'USER' => '_www'
+    'HOME' => '/Library/WebServer'
+    'HTTP_COOKIE' => 'PHPSESSID=31b53bln7c49c6jeghq4n840g9; _identity=d1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa%3A2%3A%7Bi%3A0%3Bs%3A9%3A%22_identity%22%3Bi%3A1%3Bs%3A28%3A%22%5B%22101%22%2C%22test101key%22%2C2592000%5D%22%3B%7D; _csrf=ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5%22%3B%7D'
+    'HTTP_ACCEPT_LANGUAGE' => 'zh-CN,zh;q=0.9,en;q=0.8'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate'
+    'HTTP_REFERER' => 'http://yii2-amqp/index.php?r=amqp%2Findex'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_DNT' => '1'
+    'HTTP_CACHE_CONTROL' => 'max-age=0'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_HOST' => 'yii2-amqp'
+    'SCRIPT_FILENAME' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web/index.php'
+    'REDIRECT_STATUS' => '200'
+    'SERVER_NAME' => 'yii2-amqp'
+    'SERVER_PORT' => '80'
+    'SERVER_ADDR' => '127.0.0.1'
+    'REMOTE_PORT' => '61446'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'SERVER_SOFTWARE' => 'nginx/1.19.1'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'REQUEST_SCHEME' => 'http'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'DOCUMENT_ROOT' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web'
+    'DOCUMENT_URI' => '/index.php'
+    'REQUEST_URI' => '/index.php'
+    'SCRIPT_NAME' => '/index.php'
+    'CONTENT_LENGTH' => ''
+    'CONTENT_TYPE' => ''
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'FCGI_ROLE' => 'RESPONDER'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1598413524.9044
+    'REQUEST_TIME' => 1598413524
+]
+2020-08-26 05:45:51 [127.0.0.1][-][-][error][Error] Error: Call to a member function getUniqueId() on null in /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/Controller.php:356
+Stack trace:
+#0 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/Action.php(72): yii\base\Controller->getUniqueId()
+#1 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/Controller.php(154): yii\base\Action->getUniqueId()
+#2 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/Module.php(528): yii\base\Controller->runAction('index', Array)
+#3 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/web/Application.php(103): yii\base\Module->runAction('', Array)
+#4 /Users/pzr/myProject/public/yii2-amqp/vendor/yiisoft/yii2/base/Application.php(386): yii\web\Application->handleRequest(Object(yii\web\Request))
+#5 /Users/pzr/myProject/public/yii2-amqp/frontend/web/index.php(16): yii\base\Application->run()
+#6 {main}
+2020-08-26 05:45:51 [127.0.0.1][-][-][info][application] $_GET = []
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    'PHPSESSID' => '31b53bln7c49c6jeghq4n840g9'
+    '_identity' => 'd1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa:2:{i:0;s:9:\"_identity\";i:1;s:28:\"[\"101\",\"test101key\",2592000]\";}'
+    '_csrf' => 'ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a:2:{i:0;s:5:\"_csrf\";i:1;s:32:\"Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5\";}'
+]
+
+$_SESSION = [
+    '__flash' => []
+    'username' => 'pengzr'
+    '__id' => '101'
+]
+
+$_SERVER = [
+    'USER' => '_www'
+    'HOME' => '/Library/WebServer'
+    'HTTP_COOKIE' => 'PHPSESSID=31b53bln7c49c6jeghq4n840g9; _identity=d1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa%3A2%3A%7Bi%3A0%3Bs%3A9%3A%22_identity%22%3Bi%3A1%3Bs%3A28%3A%22%5B%22101%22%2C%22test101key%22%2C2592000%5D%22%3B%7D; _csrf=ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5%22%3B%7D'
+    'HTTP_ACCEPT_LANGUAGE' => 'zh-CN,zh;q=0.9,en;q=0.8'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate'
+    'HTTP_REFERER' => 'http://yii2-amqp/index.php?r=amqp%2Findex'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_DNT' => '1'
+    'HTTP_CACHE_CONTROL' => 'max-age=0'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_HOST' => 'yii2-amqp'
+    'SCRIPT_FILENAME' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web/index.php'
+    'REDIRECT_STATUS' => '200'
+    'SERVER_NAME' => 'yii2-amqp'
+    'SERVER_PORT' => '80'
+    'SERVER_ADDR' => '127.0.0.1'
+    'REMOTE_PORT' => '61452'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'SERVER_SOFTWARE' => 'nginx/1.19.1'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'REQUEST_SCHEME' => 'http'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'DOCUMENT_ROOT' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web'
+    'DOCUMENT_URI' => '/index.php'
+    'REQUEST_URI' => '/index.php'
+    'SCRIPT_NAME' => '/index.php'
+    'CONTENT_LENGTH' => ''
+    'CONTENT_TYPE' => ''
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'FCGI_ROLE' => 'RESPONDER'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1598413551.4494
+    'REQUEST_TIME' => 1598413551
+]
+2020-08-26 05:46:23 [127.0.0.1][101][-][warning][yii\web\Session::init] Session is already started
+2020-08-26 05:46:23 [127.0.0.1][101][-][info][application] $_GET = []
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    'PHPSESSID' => '31b53bln7c49c6jeghq4n840g9'
+    '_identity' => 'd1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa:2:{i:0;s:9:\"_identity\";i:1;s:28:\"[\"101\",\"test101key\",2592000]\";}'
+    '_csrf' => 'ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a:2:{i:0;s:5:\"_csrf\";i:1;s:32:\"Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5\";}'
+]
+
+$_SESSION = [
+    '__flash' => []
+    'username' => 'pengzr'
+    '__id' => '101'
+]
+
+$_SERVER = [
+    'USER' => '_www'
+    'HOME' => '/Library/WebServer'
+    'HTTP_COOKIE' => 'PHPSESSID=31b53bln7c49c6jeghq4n840g9; _identity=d1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa%3A2%3A%7Bi%3A0%3Bs%3A9%3A%22_identity%22%3Bi%3A1%3Bs%3A28%3A%22%5B%22101%22%2C%22test101key%22%2C2592000%5D%22%3B%7D; _csrf=ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5%22%3B%7D'
+    'HTTP_ACCEPT_LANGUAGE' => 'zh-CN,zh;q=0.9,en;q=0.8'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate'
+    'HTTP_REFERER' => 'http://yii2-amqp/index.php?r=amqp%2Findex'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_DNT' => '1'
+    'HTTP_CACHE_CONTROL' => 'max-age=0'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_HOST' => 'yii2-amqp'
+    'SCRIPT_FILENAME' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web/index.php'
+    'REDIRECT_STATUS' => '200'
+    'SERVER_NAME' => 'yii2-amqp'
+    'SERVER_PORT' => '80'
+    'SERVER_ADDR' => '127.0.0.1'
+    'REMOTE_PORT' => '61461'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'SERVER_SOFTWARE' => 'nginx/1.19.1'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'REQUEST_SCHEME' => 'http'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'DOCUMENT_ROOT' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web'
+    'DOCUMENT_URI' => '/index.php'
+    'REQUEST_URI' => '/index.php'
+    'SCRIPT_NAME' => '/index.php'
+    'CONTENT_LENGTH' => ''
+    'CONTENT_TYPE' => ''
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'FCGI_ROLE' => 'RESPONDER'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1598413583.3541
+    'REQUEST_TIME' => 1598413583
+]
+2020-08-26 05:47:17 [127.0.0.1][101][-][warning][yii\web\Session::init] Session is already started
+2020-08-26 05:47:17 [127.0.0.1][101][-][info][application] $_GET = []
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    'PHPSESSID' => '31b53bln7c49c6jeghq4n840g9'
+    '_identity' => 'd1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa:2:{i:0;s:9:\"_identity\";i:1;s:28:\"[\"101\",\"test101key\",2592000]\";}'
+    '_csrf' => 'ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a:2:{i:0;s:5:\"_csrf\";i:1;s:32:\"Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5\";}'
+]
+
+$_SESSION = [
+    '__flash' => []
+    'username' => 'pengzr'
+    '__id' => '101'
+]
+
+$_SERVER = [
+    'USER' => '_www'
+    'HOME' => '/Library/WebServer'
+    'HTTP_COOKIE' => 'PHPSESSID=31b53bln7c49c6jeghq4n840g9; _identity=d1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa%3A2%3A%7Bi%3A0%3Bs%3A9%3A%22_identity%22%3Bi%3A1%3Bs%3A28%3A%22%5B%22101%22%2C%22test101key%22%2C2592000%5D%22%3B%7D; _csrf=ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5%22%3B%7D'
+    'HTTP_ACCEPT_LANGUAGE' => 'zh-CN,zh;q=0.9,en;q=0.8'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate'
+    'HTTP_REFERER' => 'http://yii2-amqp/index.php?r=amqp%2Findex'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_DNT' => '1'
+    'HTTP_CACHE_CONTROL' => 'max-age=0'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_HOST' => 'yii2-amqp'
+    'SCRIPT_FILENAME' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web/index.php'
+    'REDIRECT_STATUS' => '200'
+    'SERVER_NAME' => 'yii2-amqp'
+    'SERVER_PORT' => '80'
+    'SERVER_ADDR' => '127.0.0.1'
+    'REMOTE_PORT' => '61476'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'SERVER_SOFTWARE' => 'nginx/1.19.1'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'REQUEST_SCHEME' => 'http'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'DOCUMENT_ROOT' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web'
+    'DOCUMENT_URI' => '/index.php'
+    'REQUEST_URI' => '/index.php'
+    'SCRIPT_NAME' => '/index.php'
+    'CONTENT_LENGTH' => ''
+    'CONTENT_TYPE' => ''
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'FCGI_ROLE' => 'RESPONDER'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1598413637.4004
+    'REQUEST_TIME' => 1598413637
+]
+2020-08-26 05:47:19 [127.0.0.1][101][-][warning][yii\web\Session::init] Session is already started
+2020-08-26 05:47:19 [127.0.0.1][101][-][info][application] $_GET = []
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    'PHPSESSID' => '31b53bln7c49c6jeghq4n840g9'
+    '_identity' => 'd1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa:2:{i:0;s:9:\"_identity\";i:1;s:28:\"[\"101\",\"test101key\",2592000]\";}'
+    '_csrf' => 'ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a:2:{i:0;s:5:\"_csrf\";i:1;s:32:\"Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5\";}'
+]
+
+$_SESSION = [
+    '__flash' => []
+    'username' => 'pengzr'
+    '__id' => '101'
+]
+
+$_SERVER = [
+    'USER' => '_www'
+    'HOME' => '/Library/WebServer'
+    'HTTP_COOKIE' => 'PHPSESSID=31b53bln7c49c6jeghq4n840g9; _identity=d1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa%3A2%3A%7Bi%3A0%3Bs%3A9%3A%22_identity%22%3Bi%3A1%3Bs%3A28%3A%22%5B%22101%22%2C%22test101key%22%2C2592000%5D%22%3B%7D; _csrf=ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5%22%3B%7D'
+    'HTTP_ACCEPT_LANGUAGE' => 'zh-CN,zh;q=0.9,en;q=0.8'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate'
+    'HTTP_REFERER' => 'http://yii2-amqp/index.php'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'
+    'HTTP_DNT' => '1'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_HOST' => 'yii2-amqp'
+    'SCRIPT_FILENAME' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web/index.php'
+    'REDIRECT_STATUS' => '200'
+    'SERVER_NAME' => 'yii2-amqp'
+    'SERVER_PORT' => '80'
+    'SERVER_ADDR' => '127.0.0.1'
+    'REMOTE_PORT' => '61479'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'SERVER_SOFTWARE' => 'nginx/1.19.1'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'REQUEST_SCHEME' => 'http'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'DOCUMENT_ROOT' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web'
+    'DOCUMENT_URI' => '/index.php'
+    'REQUEST_URI' => '/index.php'
+    'SCRIPT_NAME' => '/index.php'
+    'CONTENT_LENGTH' => ''
+    'CONTENT_TYPE' => ''
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'FCGI_ROLE' => 'RESPONDER'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1598413639.3853
+    'REQUEST_TIME' => 1598413639
+]
+2020-08-26 05:47:32 [127.0.0.1][101][-][warning][yii\web\Session::init] Session is already started
+2020-08-26 05:47:32 [127.0.0.1][101][-][info][application] $_GET = []
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    'PHPSESSID' => '31b53bln7c49c6jeghq4n840g9'
+    '_identity' => 'd1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa:2:{i:0;s:9:\"_identity\";i:1;s:28:\"[\"101\",\"test101key\",2592000]\";}'
+    '_csrf' => 'ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a:2:{i:0;s:5:\"_csrf\";i:1;s:32:\"Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5\";}'
+]
+
+$_SESSION = [
+    '__flash' => []
+    'username' => 'pengzr'
+    '__id' => '101'
+]
+
+$_SERVER = [
+    'USER' => '_www'
+    'HOME' => '/Library/WebServer'
+    'HTTP_COOKIE' => 'PHPSESSID=31b53bln7c49c6jeghq4n840g9; _identity=d1c6c9f9198a7e21a4e6a8207cb7f2ccbfc0e434a573ff167e0cdb8e41278acfa%3A2%3A%7Bi%3A0%3Bs%3A9%3A%22_identity%22%3Bi%3A1%3Bs%3A28%3A%22%5B%22101%22%2C%22test101key%22%2C2592000%5D%22%3B%7D; _csrf=ac04795cf46bb64e4e7a5ed908907f73a26809490d21ba77a758f91b64b2def0a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22Ml_-v8wd-VKd65wI5kg7mxLAXFgkhsp5%22%3B%7D'
+    'HTTP_ACCEPT_LANGUAGE' => 'zh-CN,zh;q=0.9,en;q=0.8'
+    'HTTP_ACCEPT_ENCODING' => 'gzip, deflate'
+    'HTTP_REFERER' => 'http://yii2-amqp/index.php'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_DNT' => '1'
+    'HTTP_CACHE_CONTROL' => 'max-age=0'
+    'HTTP_CONNECTION' => 'keep-alive'
+    'HTTP_HOST' => 'yii2-amqp'
+    'SCRIPT_FILENAME' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web/index.php'
+    'REDIRECT_STATUS' => '200'
+    'SERVER_NAME' => 'yii2-amqp'
+    'SERVER_PORT' => '80'
+    'SERVER_ADDR' => '127.0.0.1'
+    'REMOTE_PORT' => '61480'
+    'REMOTE_ADDR' => '127.0.0.1'
+    'SERVER_SOFTWARE' => 'nginx/1.19.1'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'REQUEST_SCHEME' => 'http'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'DOCUMENT_ROOT' => '/Users/pzr/myProject/public/yii2-amqp/frontend/web'
+    'DOCUMENT_URI' => '/index.php'
+    'REQUEST_URI' => '/index.php'
+    'SCRIPT_NAME' => '/index.php'
+    'CONTENT_LENGTH' => ''
+    'CONTENT_TYPE' => ''
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'FCGI_ROLE' => 'RESPONDER'
+    'PHP_SELF' => '/index.php'
+    'REQUEST_TIME_FLOAT' => 1598413652.7618
+    'REQUEST_TIME' => 1598413652
+]

@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\AmqpForm;
 use app\models\LoginForm;
+use Monolog\Logger;
 use pzr\amqp\Amqp;
 use pzr\amqp\api\AmqpApi;
 use yii\web\Controller;
@@ -13,9 +14,10 @@ use Yii;
 
 class AmqpController extends Controller
 {
+
     public function actionRequest($command, $pid = 0, $ppid = 0)
     {
-        $this->auth();
+        $flag = $this->auth();
         // 接收到请求命令之后，向AMQP服务端发送命令
         $client = new Client();
         $client->request($command . '|' . $pid, $_SESSION['username'], $_SERVER['REMOTE_ADDR']);
@@ -29,7 +31,7 @@ class AmqpController extends Controller
      */
     public function actionIndex()
     {
-        $this->auth();
+        $flag = $this->auth();
         $model = new AmqpForm();
         return $this->render('/amqp/index', [
             'model' => $model
@@ -59,7 +61,8 @@ class AmqpController extends Controller
         foreach($detail as $d) {
             $conn = $d['channel_details']['connection_name'];
             $logger->addLog(
-                sprintf("DELETE [%s] CONNECTION: %s", $queue, $conn)
+                sprintf("DELETE [%s] CONNECTION: %s", $queue, $conn),
+                Logger::WARNING
             );
             $api->closeConnection($conn);
         }
@@ -71,7 +74,8 @@ class AmqpController extends Controller
         if (empty($conn) || empty($queue)) exit(1);
         $logger = AmqpIni::getLogger();
         $logger->addLog(
-            sprintf("DELETE [%s] CONNECTION: %s", $queue, $conn)
+            sprintf("DELETE [%s] CONNECTION: %s", $queue, $conn),
+            Logger::WARNING
         );
         $config = AmqpIni::readAmqp();
         $api = new AmqpApi($config);
@@ -123,8 +127,12 @@ class AmqpController extends Controller
         return $this->goHome();
     }
 
-    public function auth() {
-        if (!isset($_SESSION['username'])) $this->redirect('index.php?r=amqp/login');
+    protected function auth() {
+        if (!isset($_SESSION['username'])) {
+            unset($_SESSION['username']);
+            $this->redirect('index.php?r=amqp/login');
+            exit(0);
+        }
         return true;
     }
 }
