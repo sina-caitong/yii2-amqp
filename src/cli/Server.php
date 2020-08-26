@@ -15,8 +15,7 @@ class Server
     {
         $this->command = new Command();
         $this->unixPath = AmqpIni::getUnix();
-        list($access_log, $error_log, $level) = AmqpIni::getDefaultLogger();
-        $this->logger = new Logger($access_log, $error_log, $level);
+        $this->logger = AmqpIni::getLogger();
     }
 
 
@@ -24,7 +23,7 @@ class Server
     {
         $socket = socket_create(AF_UNIX, SOCK_STREAM, 0);
         @unlink($this->unixPath);
-        socket_bind($socket, $this->unixPath) or exit('bind error');
+        socket_bind($socket, $this->unixPath) or AmqpIni::exit('socket bind error');
         chmod($this->unixPath, 0777);
         socket_listen($socket);
         $client = [$socket];
@@ -42,9 +41,7 @@ class Server
                 if ($sock === $socket) continue;
                 $buffer = socket_read($sock, 1024);
                 if (!empty($buffer)) {
-                    $this->logger->addLog('request:' . $buffer);
-                    $response = $this->command->dispatch($buffer);
-                    $this->logger->addLog('response：' . $response);
+                    $this->command->dispatch($buffer);
                 } else {
                     $index = array_search($sock, $client);
                     if ($index !== false) {

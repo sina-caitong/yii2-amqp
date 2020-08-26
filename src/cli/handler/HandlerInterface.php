@@ -14,7 +14,8 @@ interface HandlerInterface
     const QUEUE = 'process_file_manager';
 
     /** 消息队列：处理增加一条新增的消费者消息 */
-    public function addQueue(int $pid, int $ppid, string $queue, int $qos);
+    // public function addQueue(int $pid, int $ppid, string $queue, int $qos);
+    public function addQueue(int $pid, int $ppid, string $queue, string $program);
 
     /** 消息队列：处理杀死子进程PID || 父进程PPID */
     public function delPid(int $pid=0, int $ppid=0);

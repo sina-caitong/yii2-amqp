@@ -12,7 +12,7 @@ class ConsumerJob extends AmqpJob
     public $pid;
     public $ppid;
     public $queueName;
-    public $qos;
+    public $program;
     public $event;
     protected $handler;
     /** @var Logger  */
@@ -31,7 +31,7 @@ class ConsumerJob extends AmqpJob
                     $this->pid,
                     $this->ppid,
                     $this->queueName,
-                    $this->qos
+                    $this->program
                 );
                 break;
             case HandlerInterface::EVENT_DELETE_PID:

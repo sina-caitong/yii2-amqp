@@ -11,8 +11,7 @@
 defined('YII_DEBUG') or define('YII_DEBUG', true);
 defined('YII_ENV') or define('YII_ENV', 'dev');
 
-$baseDir = require dirname(__DIR__, 2) . '/FindVendor.php';
-var_dump($baseDir); die;
+$baseDir = require dirname(__DIR__) . '/FindVendor.php';
 require $baseDir . '/vendor/autoload.php';
 require $baseDir . '/vendor/yiisoft/yii2/Yii.php';
 

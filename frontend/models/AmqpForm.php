@@ -4,6 +4,7 @@ namespace app\models;
 
 use pzr\amqp\Amqp;
 use pzr\amqp\api\AmqpApi;
+use pzr\amqp\cli\Consumer;
 use pzr\amqp\cli\helper\AmqpIni;
 use pzr\amqp\cli\helper\ProcessHelper;
 use yii\base\Model;
@@ -61,53 +62,48 @@ class AmqpForm extends Model
         return $path;
     }
 
-    public function stat()
+    public function statV2()
     {
+        $files = AmqpIni::getConsumerFile();
+        $config = AmqpIni::readAmqp();
+        $api = new AmqpApi($config);
+        $statFile = $this->statFile();
+
         $default = [
             'declare' => false,
-            'numprocs' => 0,
-            'consumerTags' => [],
             'nums' => 0,
             'processNums' => 0,
             'qos' => 1,
             'ack' => false,
+            'connections' => []
         ];
+        $queueArray = [];
 
-        $array = AmqpIni::parseIni();
-        $files = $array['files'];
-        $config = AmqpIni::readAmqp();
-        $api = new AmqpApi($config);
-        $statFile = $this->statFile();
-        $consumerArray = [];
-        foreach ($files as $fileArray) {
-            if (empty($fileArray)) continue;
-            $queueName = $fileArray['queueName'];
-            if (empty($queueName)) continue;
-            $duplicate = $fileArray['duplicate'] ?: 1;
-            $numprocs = $fileArray['numprocs'] ?: 1;
-
-            for ($i = 0; $i < $duplicate; $i++) {
-                $queue = $duplicate > 1 ? $queueName . '_' . $i : $queueName;
+        foreach ($files as $file) {
+            $config = parse_ini_file($file);
+            $consumer = new Consumer($config);
+            foreach ($consumer->getQueues() as $c) {
+                $queue = $c->queueName;
+                if (isset($queueArray[$queue])) continue;
+                $queueArray[$queue] = 1;
                 $info = $api->getInfosByQueue($queue);
                 $isDeclare = isset($info['consumer_details']) ? true : false;
                 $consumerArray[$queue]['isDeclare'] = $isDeclare;
-                $consumerArray[$queue]['numprocs'] = $numprocs;
                 if (!$isDeclare) continue;
                 $detail = $info['consumer_details'];
-                $consumerTags = [];
+                $connections = [];
                 foreach ($detail as $v) {
-                    $consumerTags[] = [
-                        'tag' => $v['consumer_tag'],
+                    $connections[] = [
                         'qos' => $v['prefetch_count'],
                         'ack' => $v['ack_required'],
                         'connection' => $v['channel_details']['connection_name'],
                     ];
                 }
-                $consumerArray[$queue]['consumerTags'] = array_merge(
-                    isset($consumerArray[$queue]['consumerTags']) ? $consumerArray[$queue]['consumerTags'] : [],
-                    $consumerTags
+                $consumerArray[$queue]['connections'] = array_merge(
+                    isset($consumerArray[$queue]['connections']) ? $consumerArray[$queue]['connections'] : [],
+                    $connections
                 );
-                $consumerArray[$queue]['nums'] = count($consumerArray[$queue]['consumerTags']);
+                $consumerArray[$queue]['nums'] = count($consumerArray[$queue]['connections']);
                 $consumerArray[$queue]['processNums'] = isset($statFile[$queue]) ? $statFile[$queue] : 0;
             }
         }
@@ -125,7 +121,7 @@ class AmqpForm extends Model
         $array = ProcessHelper::read();
         $stat = array();
         foreach ($array as $v) {
-            list($pid, $ppid, $queueName, $qos) = $v;
+            list($pid, $ppid, $queueName, $program) = $v;
             // $str = substr($queueName, -2);
             // $queue = preg_match('/^_\d$/', $str) ? substr($queueName, 0, -2) : $queueName;
             isset($stat[$queueName]) ? $stat[$queueName]++ : $stat[$queueName] = 1;
@@ -143,7 +139,7 @@ class AmqpForm extends Model
         $color = array();
         $domainCheck = array();
         foreach ($array as $v) {
-            list($pid, $ppid, $queueName, $qos) = $v;
+            list($pid, $ppid, $queueName, $program) = $v;
             $isAlive = $domainCheck[$ppid] = isset($domainCheck[$ppid]) ? $domainCheck[$ppid] : AmqpIni::checkProcessAlive($ppid);
             $ppid = $isAlive ? $ppid : 1;
             $str = substr($queueName, -2);
@@ -154,7 +150,7 @@ class AmqpForm extends Model
                 'pid' => $pid,
                 'ppid' => $ppid,
                 'queueName' => $queueName,
-                'qos' => $qos,
+                'program' => $program,
                 'color' => $color[$queue],
                 'ppidAlive' => $isAlive,
             ];

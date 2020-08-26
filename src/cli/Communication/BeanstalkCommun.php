@@ -52,10 +52,10 @@ class BeanstalkCommun extends BaseCommun
             
     }
 
-    public function write(string $queueName, int $qos)
+    public function write(string $queueName, string $program)
     {
-        if (empty($queueName) || empty($qos)) return false;
-        $string = $queueName . ',' . $qos;
+        if (empty($queueName) || empty($program)) return false;
+        $string = $queueName . ',' . $program;
         $this->talker->useTube(self::PIPE)->put($string);
         $this->logger->addLog(sprintf("[talker] write:%s", $string));
     }
@@ -64,8 +64,8 @@ class BeanstalkCommun extends BaseCommun
     {
         $strings = [];
         foreach ($array as $a) {
-            if (empty($a['queueName']) || empty($a['qos'])) continue;
-            $string = $a['queueName'] . ',' . $a['qos'];
+            if (empty($a['queueName']) || empty($a['program'])) continue;
+            $string = $a['queueName'] . ',' . $a['program'];
             $this->talker->useTube(self::PIPE)->put($string);
             $strings[] = $string;
         }

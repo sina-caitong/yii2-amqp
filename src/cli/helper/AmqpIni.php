@@ -5,6 +5,7 @@ namespace pzr\amqp\cli\helper;
 use Exception;
 use Monolog\Logger as BaseLogger;
 use pzr\amqp\api\AmqpApi;
+use pzr\amqp\cli\Consumer;
 use pzr\amqp\cli\helper\ProcessHelper;
 use pzr\amqp\cli\logger\Logger;
 
@@ -45,15 +46,8 @@ class AmqpIni
     {
         $array = static::readIni();
         $amqp = static::readAmqp();
-        $files = static::readInclude($array);
-        return [
-            'amqp' => $amqp,
-            // 两种思路了已经：
-            // files按消费者的配置文件启动消费者
-            // queues是综合了所有的消费者配置文件，并且过滤了已经创建的消费者
-            'files' => $files,
-            'queues' => static::$queueArray,
-        ];
+        $consumers = static::readInclude();
+        return $consumers;
     }
 
     public static function readHandler()
@@ -70,7 +64,6 @@ class AmqpIni
         return $handlerArray;
     }
 
-
     public static function readAmqp()
     {
         $array = static::readIni();
@@ -85,6 +78,116 @@ class AmqpIni
         $amqpApi->checkActive() or static::exit('AMQP Serve connected failed');
         static::$amqpApi = $amqpApi;
         return $array['amqp'];
+    }
+
+    public static function readInclude()
+    {
+        $files = static::getConsumerFile();
+        $databack = [];
+        foreach ($files as $file) {
+            $consumers = static::getConsumer($file);
+            if (empty($consumers)) continue;
+            $databack = array_merge($databack, $consumers);
+        }
+        return $databack;
+    }
+
+    public static function readCommun()
+    {
+        $array = static::readIni();
+        $className = isset($array['communication']['class']) ? $array['communication']['class'] : 'pipe';
+        array_key_exists($className, self::$communClassMap) or static::exit('invalid value of : ' . $className . ', available value is : ' . implode('|', array_keys(self::$communClassMap)));
+        $class = self::$communClassMap[$className];
+        isset($array[$className]) or self::exit(' read module [' . $className . '] failed');
+        $communArray = isset($array[$className]) ? $array[$className] : array();
+        $communArray['class'] = $class;
+        static::loggerHelp($communArray);
+        return $communArray;
+    }
+
+    public static function readIni()
+    {
+        if (!empty(static::$array)) return static::$array;
+        is_file(DEFALUT_AMQPINI_PATH) or static::exit(DEFALUT_AMQPINI_PATH . ' : amqpini no such file');
+        static::$array = parse_ini_file(DEFALUT_AMQPINI_PATH, true);
+        return static::$array;
+    }
+
+    public static function readCommon()
+    {
+        $array = static::readIni();
+        isset($array['common']) or static::exit("read [common] module failed");
+        $common = $array['common'];
+        $pidfile = isset($common['pidfile']) && !empty($common['pidfile']) ? $common['pidfile'] : DEFAULT_PIDFILE_PATH;
+        $pidfile = static::findRealpath($pidfile);
+        is_file($pidfile) or static::exit($pidfile . ' :pidfile no such file');
+        $common['pidfile'] = $pidfile;
+        return $common;
+    }
+
+    public static function readPpid()
+    {
+        $common = static::readCommon();
+        $pidfile = $common['pidfile'];
+        return intval(file_get_contents($pidfile));
+    }
+
+    public static function writePpid(int $ppid)
+    {
+        $common = static::readCommon();
+        $pidfile = $common['pidfile'];
+        return file_put_contents($pidfile, $ppid);
+    }
+
+    public static function getConsumerFile()
+    {
+        $array = static::readIni();
+        isset($array['include']['files']) or static::exit('read [include][files] module failed');
+        $filepath = $array['include']['files'];
+        $realpath = static::findRealpath($filepath, false);
+        $str = strrchr($realpath, '/'); //正则匹配返回类似：/*.ini
+        $dir = str_replace($str, '', $realpath);
+        is_dir($dir) or static::exit($dir . ' : no such directory');
+        $str = str_replace(['/', '.', '*'], ['', '\.', '.*?'], $str);
+        $pattern =  '/^' . $str . '$/';
+        $files = scandir($dir);
+        $databack = [];
+        foreach ($files as $file) {
+            if ($file == '.' || $file == '..') continue;
+            if (!preg_match($pattern, $file)) continue;
+            $filepath = $dir . '/' . $file;
+            $databack[] = $filepath;
+        }
+        return $databack;
+    }
+
+    public static function getConsumer($filepath)
+    {
+        $config = parse_ini_file($filepath);
+        if (empty($config['program']) || !preg_match('/\w+/', $config['program'])) {
+            static::exit(sprintf("invalid value of program :%s in file:%s", $config['program'], $filepath));
+        }
+        if (empty($config['script']) || !is_file($config['script'])) {
+            static::exit(sprintf("[consumer] %s : no such script in file:%s", $config['script'], $filepath));
+        }
+        if (empty($config['queueName'])) {
+            static::exit(sprintf("invalid value of queueName :%s in file:%s", $config['queueName'], $filepath));
+        }
+
+        try {
+            $consumer = new Consumer($config);
+        } catch (Exception $e) {
+            static::exit($e->getMessage());
+        }
+
+        $consumers = array();
+        $queues = $consumer->getQueues();
+        foreach ($queues as $c) {
+            $isExist = ProcessHelper::isProcessExit($config['queueName'], $config['program']);
+            if ($isExist) continue;
+            $consumers[] = $c;
+        }
+        return $consumers;
     }
 
     public static function getDefaultLogger()
@@ -141,99 +244,6 @@ class AmqpIni
         return $realpath;
     }
 
-    public static function readInclude()
-    {
-        $array = static::readIni();
-        isset($array['include']['files']) or static::exit('read [include][files] module failed');
-        $filepath = $array['include']['files'];
-        $realpath = static::findRealpath($filepath, false);
-        $str = strrchr($realpath, '/'); //正则匹配返回类似：/*.ini
-        $dir = str_replace($str, '', $realpath);
-        is_dir($dir) or static::exit($dir . ' : no such directory');
-        $str = str_replace(['/', '.', '*'], ['', '\.', '.*?'], $str);
-        $pattern =  '/^' . $str . '$/';
-        $files = scandir($dir);
-        $databack = [];
-        foreach ($files as $file) {
-            if ($file == '.' || $file == '..') continue;
-            if (preg_match($pattern, $file)) {
-                $filepath = $dir . '/' . $file;
-                $fileArray = static::checkConsumerFile($filepath);
-                if (empty($fileArray)) continue;
-                $databack[] = $fileArray;
-            }
-        }
-        return $databack;
-    }
-
-    public static function checkConsumerFile($filepath)
-    {
-        $array = parse_ini_file($filepath);
-        !empty($array['queueName']) or static::exit('invalid value : queueName');
-        $array['qos'] = $qos = isset($array['qos']) && intval($array['qos']) > 0 ?  $array['qos'] : 1;
-        $array['duplicate'] = $duplicate = isset($array['duplicate']) && intval($array['duplicate']) >= 1 ?  $array['duplicate'] : 1;
-        $array['numprocs'] = $numprocs = isset($array['numprocs']) && intval($array['numprocs']) ?  $array['numprocs'] : 1;
-        $array['program'] = $program = isset($array['program']) && !empty($array['program']) ?  $array['program'] : uniqid();
-        // 校验queueName是否存在，校验是否已经启动消费者
-        $amqpApi = static::$amqpApi;
-        $queueName = $array['queueName'];
-        $stat = static::statProcess();
-        for ($i = 0; $i < $duplicate; $i++) {
-            $queue = $duplicate == 1 ? $queueName : $queueName . '_' . $i;
-            $info = $amqpApi->getBinding($queue);
-            if (empty($info)) {
-                static::$logger->addLog($queue . ' is not decalre', BaseLogger::WARNING);
-                continue;
-            }
-            $num = isset($stat[$queue]) ? $stat[$queue] : 0;
-            $processNum = ($numprocs - $num) > 0 ? ($numprocs - $num) : 0;
-            for ($k = 0; $k < $processNum; $k++) {
-                // 因为没有将启动消费者的配置项视为对象，从而带来的问题就是修改格式会很麻烦
-                // 起初觉得这么做不会在变了，但是做着做着发现还是有很多优化的空间
-                // 所有面向对象的思想不能偷懒
-                static::$queueArray[] = [$queue, $qos];
-            }
-        }
-        return $array;
-    }
-
-    public static function statProcess()
-    {
-        $array = ProcessHelper::read();
-        $stat = array();
-        foreach ($array as $v) {
-            list($pid, $ppid, $queueName, $qos) = $v;
-            isset($stat[$queueName]) ? $stat[$queueName]++ : $stat[$queueName] = 1;
-        }
-        return $stat;
-    }
-
-    public static function readCommon()
-    {
-        $array = static::readIni();
-        isset($array['common']) or static::exit("read [common] module failed");
-        $common = $array['common'];
-        $pidfile = isset($common['pidfile']) && !empty($common['pidfile']) ? $common['pidfile'] : DEFAULT_PIDFILE_PATH;
-        $pidfile = static::findRealpath($pidfile);
-        is_file($pidfile) or static::exit($pidfile . ' :pidfile no such file');
-        $common['pidfile'] = $pidfile;
-        return $common;
-    }
-
-    public static function readPpid()
-    {
-        $common = static::readCommon();
-        $pidfile = $common['pidfile'];
-        return intval(file_get_contents($pidfile));
-    }
-
-    public static function writePpid(int $ppid)
-    {
-        $common = static::readCommon();
-        $pidfile = $common['pidfile'];
-        return file_put_contents($pidfile, $ppid);
-    }
-
     public static function checkProcessAlive($pid)
     {
         if (empty($pid)) return false;
@@ -244,28 +254,16 @@ class AmqpIni
         return empty($matches) ? false : ($matches[1] == $pid ? true : false);
     }
 
-    public static function readCommun()
+    public static function statProcess()
     {
-        $array = static::readIni();
-        $className = isset($array['communication']['class']) ? $array['communication']['class'] : 'pipe';
-        array_key_exists($className, self::$communClassMap) or static::exit('invalid value of : ' . $className . ', available value is : ' . implode('|', array_keys(self::$communClassMap)));
-        $class = self::$communClassMap[$className];
-        isset($array[$className]) or self::exit(' read module [' . $className . '] failed');
-        $communArray = isset($array[$className]) ? $array[$className] : array();
-        $communArray['class'] = $class;
-        static::loggerHelp($communArray);
-        return $communArray;
+        $array = ProcessHelper::read();
+        $stat = array();
+        foreach ($array as $v) {
+            list($pid, $ppid, $queueName, $program) = $v;
+            isset($stat[$queueName]) ? $stat[$queueName]++ : $stat[$queueName] = 1;
+        }
+        return $stat;
     }
-
-    public static function readIni()
-    {
-        if (!empty(static::$array)) return static::$array;
-        is_file(DEFALUT_AMQPINI_PATH) or static::exit(DEFALUT_AMQPINI_PATH . ' : amqpini no such file');
-        static::$array = parse_ini_file(DEFALUT_AMQPINI_PATH, true);
-        return static::$array;
-    }
-
-    
 
     public static function getCommand()
     {
@@ -287,7 +285,8 @@ class AmqpIni
         return true;
     }
 
-    public static function getLogger() {
+    public static function getLogger()
+    {
         list($access_log, $error_log, $level) = static::getDefaultLogger();
         return new Logger($access_log, $error_log, $level);
     }
@@ -298,10 +297,22 @@ class AmqpIni
         exit($error);
     }
 
-    public static function addLog($msg, $level=BaseLogger::INFO)
+    public static function addLog($msg, $level = BaseLogger::INFO)
     {
         if (!static::$logger)
             static::$logger = new Logger(DEFAULT_ACCESS_LOG, DEFAULT_ERROR_LOG);
         static::$logger->addLog($msg, $level);
+    }
+
+    public static function getConsumersByProgram($program)
+    {
+        $files = static::getConsumerFile();
+        foreach ($files as $file) {
+            $config = parse_ini_file($file);
+            if ($config['program'] == $program) {
+                return $config;
+            }
+        }
+        return [];
     }
 }

@@ -22,17 +22,17 @@ class AmqpHandler extends BaseHandler
     }
 
 
-    public function addQueue(int $pid, int $ppid, string $queue, int $qos)
+    public function addQueue(int $pid, int $ppid, string $queue, string $program)
     {
-        if (empty($pid) || empty($ppid) || empty($queue) || empty($qos)) {
+        if (empty($pid) || empty($ppid) || empty($queue) || empty($program)) {
             return false;
         }
-        $this->logger->addLog(sprintf("[%s] %s=%s,%s", self::EVENT_ADD_QUEUE, $pid, $queue, $qos));
+        $this->logger->addLog(sprintf("[%s] %s=%s,%s", self::EVENT_ADD_QUEUE, $pid, $queue, $program));
         $job = new ConsumerJob([
             'pid' => $pid,
             'ppid' => $ppid,
             'queueName' => $queue,
-            'qos' => $qos,
+            'program' => $program,
             'event' => self::EVENT_ADD_QUEUE,
         ]);
         $this->amqp->push($job);

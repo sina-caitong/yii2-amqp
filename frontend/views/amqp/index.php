@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <th>子进程ID</th>
             <th>父进程ID</th>
             <th>队列名称</th>
-            <th>QOS</th>
+            <th>文件标志</th>
             <th width="50%">操作</th>
         </thead>
         <?php foreach ($list as $queue => $d) {
@@ -38,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <td><?= $v['pid'] ?></td>
                         <td><?= $v['ppid'] ?></td>
                         <td><?= $v['queueName'] ?></td>
-                        <td><?= $v['qos'] ?></td>
+                        <td><?= $v['program'] ?></td>
                         <td>
                             <a onclick="request('restart', <?= $v['pid'] ?>, <?= $v['ppid'] ?>)">restart</a> &nbsp;&nbsp;&nbsp;
                             <a onclick="request('stop', <?= $v['pid'] ?>, <?= $v['ppid'] ?>)">stop</a>&nbsp;&nbsp;&nbsp;

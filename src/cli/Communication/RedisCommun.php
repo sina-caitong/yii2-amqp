@@ -41,10 +41,10 @@ class RedisCommun extends BaseCommun
         return $array;
     }
 
-    public function write(string $queueName, int $qos)
+    public function write(string $queueName, string $program)
     {
-        if (empty($queueName) || empty($qos)) return false;
-        $string = $queueName . ',' . $qos;
+        if (empty($queueName) || empty($program)) return false;
+        $string = $queueName . ',' . $program;
         $len = $this->redis->lPush(self::PIPE, $string);
         $level = $len ? BaseLogger::INFO : BaseLogger::WARNING;
         $this->logger->addLog(sprintf("[redis] write:%s, len:%d", $string, $len), $level);
@@ -55,8 +55,8 @@ class RedisCommun extends BaseCommun
     {
         $strings = [];
         foreach ($array as $a) {
-            if (empty($a['queueName']) || empty($a['qos'])) continue;
-            $strings[] = $a['queueName'] . ',' . $a['qos'];
+            if (empty($a['queueName']) || empty($a['program'])) continue;
+            $strings[] = $a['queueName'] . ',' . $a['program'];
         }
         if (empty($strings)) return false;
         $string = implode('|', $strings);

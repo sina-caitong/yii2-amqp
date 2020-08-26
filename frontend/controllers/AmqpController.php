@@ -39,6 +39,7 @@ class AmqpController extends Controller
     public function actionStat()
     {
         $this->auth();
+
         $model = new AmqpForm();
         return $this->render('/amqp/stat', [
             'model' => $model
@@ -47,13 +48,13 @@ class AmqpController extends Controller
 
     public function actionDelbyqueue($queue)
     {
-        if (empty($queue)) exit(-1);
+        if (empty($queue)) exit(1);
         $logger = AmqpIni::getLogger();
         $config = AmqpIni::readAmqp();
         $api = new AmqpApi($config);
         $info = $api->getInfosByQueue($queue);
         $isDeclare = isset($info['consumer_details']) ? true : false;
-        if (!$isDeclare) exit(-1);
+        if (!$isDeclare) exit(1);
         $detail = $info['consumer_details'];
         foreach($detail as $d) {
             $conn = $d['channel_details']['connection_name'];
@@ -67,7 +68,7 @@ class AmqpController extends Controller
 
     public function actionDelbyconn($conn, $queue)
     {
-        if (empty($conn) || empty($queue)) exit(-1);
+        if (empty($conn) || empty($queue)) exit(1);
         $logger = AmqpIni::getLogger();
         $logger->addLog(
             sprintf("DELETE [%s] CONNECTION: %s", $queue, $conn)

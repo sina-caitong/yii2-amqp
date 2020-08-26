@@ -4,7 +4,7 @@
 namespace pzr\amqp\cli\logger;
 
 use DateTimeZone;
-use Monolog\Logger as LoggerBase;
+use Monolog\Logger as BaseLogger;
 
 class Logger
 {
@@ -12,11 +12,11 @@ class Logger
     protected $logger = null;
     public function __construct($access_log, $error_log='', string $levelString='')
     {
-        $this->logger = new LoggerBase('AMQP-CONSUMER');
+        $this->logger = new BaseLogger('AMQP-CONSUMER');
         $this->logger->setTimezone(new DateTimeZone('Asia/Shanghai'));
         $this->logger->useMicrosecondTimestamps(false);
 
-        $levels = LoggerBase::getLevels();
+        $levels = BaseLogger::getLevels();
         $levelArr = empty($levelString) ? array() : explode(',', $levelString);
         $level = array();
         foreach($levelArr as $name) {
@@ -30,7 +30,7 @@ class Logger
         );
     }
 
-    public function addLog($message, $level = LoggerBase::INFO)
+    public function addLog($message, $level = BaseLogger::INFO)
     {
         $this->logger->addRecord($level, $message);
     }

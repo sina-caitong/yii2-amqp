@@ -45,12 +45,12 @@ class AmqpCommun extends BaseCommun
         return $array;
     }
 
-    public function write(string $queueName, int $qos)
+    public function write(string $queueName, string $program)
     {
-        if (empty($queueName) || empty($qos)) return false;
-        $job = new CommunJob([$queueName, $qos]);
+        if (empty($queueName) || empty($program)) return false;
+        $job = new CommunJob([$queueName, $program]);
         $this->amqp->push($job);
-        $this->logger->addLog(sprintf("[amqp] write: queueName:%s, qos:%d"), $job->queueName, $job->qos);
+        $this->logger->addLog(sprintf("[amqp] write: queueName:%s, program:%d"), $job->queueName, $job->program);
         return true;
     }
 
@@ -59,10 +59,10 @@ class AmqpCommun extends BaseCommun
         $jobs = [];
         $string = [];
         foreach ($array as $a) {
-            list($queueName, $qos) = $a;
-            if (empty($queueName) || empty($qos)) continue;
-            $jobs[] = new CommunJob([$queueName, $qos]);
-            $string[] = $queueName.','.$qos;
+            list($queueName, $program) = $a;
+            if (empty($queueName) || empty($program)) continue;
+            $jobs[] = new CommunJob([$queueName, $program]);
+            $string[] = $queueName.','.$program;
         }
         if (empty($jobs)) return false;
         $this->amqp->publish($jobs);

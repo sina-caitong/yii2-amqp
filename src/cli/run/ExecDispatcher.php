@@ -8,4 +8,4 @@ require $baseDir . '/vendor/autoload.php';
 require $baseDir . '/vendor/yiisoft/yii2/Yii.php';
 
 $dispatch = new Dispatcher();
-$dispatch->byQueues();
+$dispatch->run();

@@ -2,6 +2,7 @@
 
 namespace pzr\amqp\cli\helper;
 
+use Monolog\Logger;
 use pzr\amqp\cli\handler\HandlerInterface;
 use pzr\amqp\cli\helper\SignoHelper;
 
@@ -11,6 +12,8 @@ class ProcessHelper
 
     const DEFAULT_PROCESS_MANAGER_PATH = __DIR__ . '/../config/process_manager.ini';
 
+    public static $array = array();
+    public static $programs = array();
     /**
      * 获取进程的信息，用于某个子进程死亡的时候可以重启。
      * 但是如果该子进程的父进程被kill -9 杀死，那么这个进程的父进程ID在linux中会变成1
@@ -27,8 +30,8 @@ class ProcessHelper
         $array = self::read();
         $key = $pid . '_' . $ppid;
         if (isset($array[$key]) && $array[$key]) {
-            list($pid, $ppid, $queueName, $qos) = $array[$key];
-            return [$queueName, $qos];
+            list($pid, $ppid, $queueName, $program) = $array[$key];
+            return [$queueName, $program];
         }
         return false;
     }
@@ -40,12 +43,33 @@ class ProcessHelper
         $databack = [];
         foreach ($array as $k => $v) {
             list($pid, $ppid) = explode('_', $k);
-            list($queueName, $qos) = explode(',', $v);
+            list($queueName, $program) = explode(',', $v);
             $databack[$k] = [
-                intval($pid), intval($ppid), $queueName, $qos
+                intval($pid), intval($ppid), $queueName, $program
             ];
         }
         return $databack;
+    }
+
+    public static function getPrograms() {
+        $array = self::read();
+        $databack = [];
+        foreach($array as $v) {
+            list($pid, $ppid, $queueName, $program) = $v;
+            $key = self::getConsumerKey($queueName, $program);
+            $databack[$key] = $program;
+        }
+        return $databack;
+    }
+
+    public static function getConsumerKey($queueName, $program) {
+        return md5($queueName . $program);
+    }
+
+    public static function isProcessExit($queueName, $program) {
+        $key = self::getConsumerKey($queueName, $program);
+        $programs = self::getPrograms();
+        return isset($programs[$key]) ? true : false;
     }
 
     public static function write(string $string, $append = false)
@@ -60,9 +84,9 @@ class ProcessHelper
     }
 
     /** @var array|string|int */
-    public static function handleAddQueue($pid, $ppid, $queueName, $qos)
+    public static function handleAddQueue($pid, $ppid, $queueName, $program)
     {
-        $ini = sprintf("%d_%d = %s,%d%s", $pid, $ppid, $queueName, $qos, PHP_EOL);
+        $ini = sprintf("%d_%d = %s,%s%s", $pid, $ppid, $queueName, $program, PHP_EOL);
         return self::write($ini, true);
     }
 
@@ -72,12 +96,12 @@ class ProcessHelper
         $array = ProcessHelper::read();
         $ini = '';
         foreach ($array as $v) {
-            list($pid, $ppid, $queueName, $qos) = $v;
+            list($pid, $ppid, $queueName, $program) = $v;
             if ($pid == $deadPid) {
-                // $this->logger->addLog(sprintf("[handle %s] %d", HandlerInterface::EVENT_DELETE_PID, $pid));
+                AmqpIni::addLog(sprintf("[handle %s] %d", HandlerInterface::EVENT_DELETE_PID, $pid));
                 continue;
             }
-            $ini .= sprintf("%d_%d = %s,%d%s", $pid, $ppid, $queueName, $qos, PHP_EOL);
+            $ini .= sprintf("%d_%d = %s,%s%s", $pid, $ppid, $queueName, $program, PHP_EOL);
         }
         return self::write($ini);
     }
@@ -87,8 +111,8 @@ class ProcessHelper
     {
         $array = ProcessHelper::read();
         foreach ($array as $v) {
-            list($pid, $ppid, $queueName, $qos) = $v;
-            // $this->logger->addLog(sprintf("[handle %s] %d", HandlerInterface::EVENT_DELETE_PPID, $ppid));
+            list($pid, $ppid, $queueName, $program) = $v;
+            AmqpIni::addLog(sprintf("[handle %s] %d", HandlerInterface::EVENT_DELETE_PPID, $ppid));
             posix_kill($pid, SignoHelper::KILL_CHILD_STOP);
         }
         return self::flush();
@@ -98,9 +122,9 @@ class ProcessHelper
     {
         $array = self::read();
         foreach ($array as $v) {
-            list($pid, $ppid, $queueName, $qos) = $v ;
+            list($pid, $ppid, $queueName, $program) = $v ;
             $res = posix_kill($pid, SignoHelper::KILL_CHILD_STOP);
-            // $this->logger->addLog(sprintf("[flush] kill -%d %d ,result is %s", SignoHelper::KILL_CHILD_STOP, $pid, $res));
+            AmqpIni::addLog(sprintf("[flush] kill -%d %d ,result is %s", SignoHelper::KILL_CHILD_STOP, $pid, $res));
         }
 
         return self::flush();

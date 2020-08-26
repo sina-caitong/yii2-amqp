@@ -10,7 +10,7 @@ use pzr\amqp\cli\logger\Logger;
 class CommunJob extends AmqpJob
 {
     public $queueName;
-    public $qos;
+    public $program;
     protected $handler;
     /** @var Logger  */
     protected $logger;
@@ -23,7 +23,7 @@ class CommunJob extends AmqpJob
     public function execute() {
         return [
             $this->queueName,
-            $this->qos
+            $this->program
         ];
     }
 

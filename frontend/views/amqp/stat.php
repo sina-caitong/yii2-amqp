@@ -10,7 +10,7 @@ use yii\bootstrap\ActiveForm;
 $this->title = 'AMQP CONSUMER TAG MANAGER';
 $this->params['breadcrumbs'][] = $this->title;
 
-$stat = $model->stat();
+$stat = $model->statV2();
 ?>
 <div class="" style="text-align: center;">
     <h1><?= Html::encode($this->title) ?></h1>
@@ -23,7 +23,6 @@ $stat = $model->stat();
                 <th>队列名称</th>
                 <th>实际消费者</th>
                 <th>文件消费者</th>
-                <th>理论消费者</th>
                 <th width="50%">操作</th>
             </thead>
             <tbody>
@@ -31,21 +30,20 @@ $stat = $model->stat();
                     <td><?= $queue ?></td>
                     <td><?= $d['nums'] ?></td>
                     <td><?= $d['processNums'] ?></td>
-                    <td><?= $d['numprocs'] ?></td>
                     <td>
                         <a onclick="delAll('<?= $queue ?>')">删除全部</a>
                     </td>
                 </tr>
                 <thead>
-                    <th colspan="2">AMQP连接</th>
+                    <th>AMQP连接</th>
                     <th>QOS</th>
                     <th>ACK</th>
                     <th></th>
                 </thead>
             </tbody>
-            <?php foreach ($d['consumerTags'] as $k => $v) { ?>
+            <?php foreach ($d['connections'] as $k => $v) { ?>
                 <tr onmouseover="this.style.backgroundColor='#ffff66';" onmouseout="this.style.backgroundColor='#d4e3e5';">
-                    <td colspan="2"><?= $v['connection'] ?></td>
+                    <td><?= $v['connection'] ?></td>
                     <td><?= $v['qos'] ?></td>
                     <td><?= $v['ack'] ?></td>
                     <td> <a onclick="delOne('<?= $v['connection'] ?>', '<?= $queue ?>')">删除</a> </td>

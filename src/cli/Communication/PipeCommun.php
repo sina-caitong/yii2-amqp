@@ -48,11 +48,11 @@ class PipeCommun extends BaseCommun
         return $data;
     }
 
-    public function write(string $queueName, int $qos)
+    public function write(string $queueName, string $program)
     {
-        if (empty($queueName) || empty($qos)) return false;
+        if (empty($queueName) || empty($program)) return false;
         $this->open();
-        $string = '|' . $queueName . ',' . $qos;
+        $string = '|' . $queueName . ',' . $program;
         $len = strlen($string);
         $size = fwrite($this->fp, $string, $len);
         $level = $len == $size ? BaseLogger::INFO : BaseLogger::WARNING;
@@ -64,8 +64,8 @@ class PipeCommun extends BaseCommun
     {
         $strings = [];
         foreach ($array as $a) {
-            if (empty($a['queueName']) || empty($a['qos'])) continue;
-            $strings[] = $a['queueName'] . ',' . $a['qos'];
+            if (empty($a['queueName']) || empty($a['program'])) continue;
+            $strings[] = $a['queueName'] . ',' . $a['program'];
         }
         if (empty($strings)) return false;
         $this->open();

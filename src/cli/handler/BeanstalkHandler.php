@@ -20,14 +20,14 @@ class BeanstalkHandler extends BaseHandler
         $this->talker = Pheanstalk::create($host, $port);
     }
 
-    public function addQueue(int $pid, int $ppid, string $queue, int $qos)
+    public function addQueue(int $pid, int $ppid, string $queue, string $program)
     {
-        if (empty($pid) || empty($ppid) || empty($queue) || empty($qos)) {
+        if (empty($pid) || empty($ppid) || empty($queue) || empty($program)) {
             return false;
         }
-        $job = [self::EVENT_ADD_QUEUE => [$pid, $ppid, $queue, $qos]];
+        $job = [self::EVENT_ADD_QUEUE => [$pid, $ppid, $queue, $program]];
         try {
-            $this->logger->addLog(sprintf("[%s] %s=%s,%s", self::EVENT_ADD_QUEUE, $pid, $queue, $qos));
+            $this->logger->addLog(sprintf("[%s] %s=%s,%s", self::EVENT_ADD_QUEUE, $pid, $queue, $program));
             $this->talker->useTube(self::QUEUE)->put(json_encode($job));
         } catch (Exception $e) {
         }
@@ -74,8 +74,8 @@ class BeanstalkHandler extends BaseHandler
         $data = $body[$event];
         switch ($event) {
             case HandlerInterface::EVENT_ADD_QUEUE:
-                list($pid, $ppid, $queueName, $qos) = $data;
-                ProcessHelper::handleAddQueue($pid, $ppid, $queueName, $qos);
+                list($pid, $ppid, $queueName, $program) = $data;
+                ProcessHelper::handleAddQueue($pid, $ppid, $queueName, $program);
                 break;
             case HandlerInterface::EVENT_DELETE_PID:
                 ProcessHelper::handleDelPid($data);
