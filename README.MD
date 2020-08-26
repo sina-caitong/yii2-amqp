@@ -4,12 +4,7 @@
 
 ## 基本用法
 
-引入包(目前处于测试版本)：  
-```shell
-composer require pzr/amqp:dev-master
-```
-
-在项目中也有详细的demo可供参考  
+引入包：`composer require pzr/amqp` 
 
 ### 简介
 队列类型：普通队列、延时队列、优先队列、RPC队列  
@@ -112,7 +107,8 @@ return array(
 );
 ```
 下文队列的定义用到的组件则是如上配置。
-#### 普通队列的定义
+
+### 普通队列的定义
 加载 amqp.php 中的 easyQueue 配置，然后在Controller中调用：  
 ```php
 Yii::$app->easyQueue->on(AmqpBase::EVENT_BEFORE_PUSH, function ($event) {
@@ -137,7 +133,7 @@ class CountJob extends \pzr\amqp\AmqpJob
 }
 ```
 
-#### 延时队列的定义
+### 延时队列的定义
 加载 amqp.php 中的 delayQueue 配置，然后在Controller中调用：  
 ```php
 Yii::$app->delayQueue->on(AmqpBase::EVENT_BEFORE_PUSH, function ($event) {
@@ -149,7 +145,7 @@ Yii::$app->delayQueue->push(new CountJob([
 ]));
 ```
 
-#### 优先队列的定义
+### 优先队列的定义
 优先队列其实在普通队列或延时队列的基础上设置即可，有两种方式。  
 （1）如普通队列在控制器中绑定的时候设置
 ```php
@@ -210,6 +206,19 @@ class AmqpController extends Controller
 php yii amqp/consumer queueName qos #启动普通消费者
 php yii amqp/rpc-consumer queueName qos #启动RPC消费者
 ```
+
+### 消费者进程管理web界面
+> 一般情况下推荐使用Supervisor管理消费者进程，但是为了更好的贴切本项目的消费者进程管理，我也尝试的做了一个管理。
+> 先来贴一些图吧！
+
+首先需要登入：
+![PHP](https://cdn.learnku.com/uploads/images/202008/26/68165/PuzyKNJygR.png!large)
+然后进入首页：
+![PHP](https://cdn.learnku.com/uploads/images/202008/26/68165/VbpoiRuNwX.png!large)
+点击Tag可以看见消费者的连接情况：
+![PHP](https://cdn.learnku.com/uploads/images/202008/26/68165/sLckspTpfE.png!large)
+点击Logger可以监控日志：
+![PHP](https://cdn.learnku.com/uploads/images/202008/26/68165/yKcHdngxWp.png!large)
 
 ### 事件定义
 | 事件 | 介绍 | 用法 |
