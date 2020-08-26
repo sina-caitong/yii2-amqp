@@ -13,6 +13,7 @@ use pzr\amqp\cli\logger\Logger;
 
 defined('DEFALUT_AMQPINI_PATH') or define('DEFALUT_AMQPINI_PATH', __DIR__ . '/../config/amqp.ini');
 defined('DEFAULT_PIDFILE_PATH') or define('DEFAULT_PIDFILE_PATH', '/usr/local/var/run/amqp_master.pid');
+defined('DEFAULT_PROCESS_PATH') or define('DEFAULT_PROCESS_PATH', __DIR__ . '/../config/process_manager.ini');
 defined('DEFAULT_ACCESS_LOG') or define('DEFAULT_ACCESS_LOG', __DIR__ . '/../log/access.log');
 defined('DEFAULT_ERROR_LOG') or define('DEFAULT_ERROR_LOG', __DIR__ . '/../log/error.log');
 
@@ -314,5 +315,17 @@ class AmqpIni
             }
         }
         return [];
+    }
+
+    public static function getProcessFile()
+    {
+        $array = static::readCommon();
+        $processFile = isset($array['process_file']) ? $array['process_file'] : '';
+        if (!empty($processFile)) {
+            $processFile = static::findRealpath($processFile);
+            return $processFile ?: static::exit($processFile . ': no such file of process_file');
+        }
+        is_file(DEFAULT_PROCESS_PATH) or touch(DEFAULT_PROCESS_PATH) or static::exit(DEFAULT_PROCESS_PATH . ': no such file of default process_file');
+        return DEFAULT_PROCESS_PATH;
     }
 }

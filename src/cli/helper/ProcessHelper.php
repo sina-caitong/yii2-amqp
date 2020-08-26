@@ -10,8 +10,6 @@ class ProcessHelper
 {
 
 
-    const DEFAULT_PROCESS_MANAGER_PATH = __DIR__ . '/../config/process_manager.ini';
-
     public static $array = array();
     public static $programs = array();
     /**
@@ -39,7 +37,7 @@ class ProcessHelper
     /** @return array */
     public static function read()
     {
-        $array = parse_ini_file(self::DEFAULT_PROCESS_MANAGER_PATH);
+        $array = parse_ini_file(AmqpIni::getProcessFile());
         $databack = [];
         foreach ($array as $k => $v) {
             list($pid, $ppid) = explode('_', $k);
@@ -75,7 +73,7 @@ class ProcessHelper
     public static function write(string $string, $append = false)
     {
         $flag = $append ? FILE_APPEND : 0;
-        return file_put_contents(self::DEFAULT_PROCESS_MANAGER_PATH, $string, $flag);
+        return file_put_contents(AmqpIni::getProcessFile(), $string, $flag);
     }
 
     public static function flush()

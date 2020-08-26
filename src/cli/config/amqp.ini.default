@@ -5,18 +5,21 @@
 ; %m 月：08
 ; %d 日：07 
 ; ../log/%Y-%m/access_%Y-%m-%d.log
-; access_log = ../log/access.log
-access_log = ../log/%Y-%m/access_%Y-%m-%d.log
+access_log = ../log/access.log
+; access_log = ../log/%Y-%m/access_%Y-%m-%d.log
 error_log = ../log/error.log
 ; 可选择：DEBUG,INFO,NOTICE,WARNING,ERROR,CRITICAL,ALERT,EMERGENCY
 ; 选中的以逗号隔开，只记录选中的类型日志
-level = info,warning,error
+level = INFO,WARNING,ERROR,NOTICE
 ; 保存AMQP消费者守护进程的PID
 pidfile = /usr/local/var/run/amqp_master.pid
 ; 执行ExecDispatcher.php脚本的命令
 command = /usr/local/php5/bin/php
 ; \pzr\amqp\cli\Server 启动unix连接的本地文件地址
 unix = /usr/local/var/run/amqp_consumer_serve.sock
+; 进程文件管理路径
+process_file = ./process_manager.ini
+
 ; AMQP消费者读取的连接配置
 [amqp]
 host = 10.71.13.24
@@ -28,8 +31,6 @@ password = guest
 [beanstalk]
 host = 127.0.0.1
 port = 11300
-; error_log =  ../log/beanstalk/error.log
-; access_log = ../log/beanstalk/access.log
 
 ; 进程文件处理：启用redis
 [redis]
@@ -38,23 +39,37 @@ port = 6379
 user = 
 password = 
 
-[handler]
-; 可选择：beanstalk、redis、amqp
-; 没有默认的值，所以必须配置一个
-class = redis
-
 ; 通知父进程的通信方式
 [pipe]
+; 子进程和父进程通信的文件地址
+pipe_file = /tmp/amqp_pipe
+
 [communication]
 ; 可选择：redis、amqp、beanstalk、pipe（默认）
 class = pipe
+
+[handler]
+; 可选择：beanstalk、redis、amqp
+; 没有默认的值，所以必须配置一个
+class = beanstalk
 
 [include]
 files = ./consumer/*.ini
 
 
-; [consumer] 在include指定的路径下配置消费者
-; queueName = 队列名称
-; qos = 1 消费者预处理数
-; duplicate = 2 队列副本数量
-; numpros = 1 消费者进程数量
+; 以下配置必须在指定的consumer目录下配置
+; [consumer]
+; program = 07_14
+; queueName = 07_14_delay_queue
+; qos = 1
+; duplicate = 1
+; numprocs = 2
+; script = /Users/pzr/myProject/public/yii2-amqp/frontend/yii
+; request = amqp/consumer
+
+; {php} 是执行php的命令占位符，这个值在[common]模块下command已经配置过
+; {script} php执行脚本
+; {request} 请求的控制器
+; {queueName} 是queueName属性的值
+; {qos} 是qos属性的值，默认为1
+; command = {php} {script} {request} {queueName} {qos}
