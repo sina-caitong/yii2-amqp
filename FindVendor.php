@@ -3,6 +3,8 @@
 
 use pzr\amqp\cli\helper\FileHelper;
 
+require __DIR__ . '/src/cli/helper/FileHelper.php';
+
 $vendor_path = __DIR__ . '/Vendor.php';
 if (is_file($vendor_path)) {
     return require $vendor_path;
