@@ -206,6 +206,13 @@ class AmqpForm extends Model
         $is_default_error_log_writable = is_writable(DEFAULT_ERROR_LOG);
         $is_default_error_log_readable = is_readable(DEFAULT_ERROR_LOG);
 
+        $unix = AmqpIni::findRealpath($array['common']['unix']);
+        $socket = socket_create(AF_UNIX, SOCK_STREAM, 0);
+        $isConn = 0;
+        if (socket_connect($socket, $unix)) {
+            $isConn = true;
+            socket_close($socket);
+        }
         
         $amqp = $array['amqp'];
         $redis = $array['redis'];
@@ -239,6 +246,10 @@ error_log = $error_log  【is_writable: $is_error_log_writable is_readable: $is_
 pipe_file = $pipe_file  【is_writable: $is_pipe_writable is_readable: $is_pipe_readable 】
 pidfile = $pidfile  【is_writable: $is_pidfile_writable is_readable: $is_pidfile_readable 】
 process_file = $process_file  【is_writable: $is_process_file_writable is_readable: $is_process_file_readable 】
+
+【server】
+unix = $unix
+isConn = $isConn
 
 【check connection】
 isAmqpActive = $isAmqpConn
