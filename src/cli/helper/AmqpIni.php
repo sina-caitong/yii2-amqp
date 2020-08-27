@@ -220,7 +220,7 @@ class AmqpIni
             return false;
         }
         if (strncmp($filepath, '.', 1)) {
-            if ($touch && !is_file($filepath) && !touch($filepath)) {
+            if ($touch && !is_file($filepath) && !touch($filepath) && !chmod($filepath, 0755)) {
                 static::addLog($filepath . ' touch failed', BaseLogger::ERROR);
                 return false;
             }
@@ -235,11 +235,11 @@ class AmqpIni
         if (preg_match('/%Y|%y|%d|%m/', $realpath)) return $realpath;
 
         $dir = str_replace(strrchr($realpath, '/'), '', $realpath);
-        if (!is_dir($dir) && !mkdir($dir, 0777, true)) {
+        if (!is_dir($dir) && !mkdir($dir, 0755, true)) {
             static::addLog($realpath . ' : realpath no such direction', BaseLogger::ERROR);
             return false;
         }
-        if (!is_file($realpath) && !touch($realpath)) {
+        if (!is_file($realpath) && !touch($realpath) && !chmod($filepath, 0755)) {
             static::addLog($realpath . ' : realpath no such file', BaseLogger::ERROR);
             return false;
         }
