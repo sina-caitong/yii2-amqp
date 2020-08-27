@@ -130,14 +130,17 @@ class AmqpIni
     {
         $common = static::readCommon();
         $pidfile = $common['pidfile'];
-        return intval(file_get_contents($pidfile));
+        // return intval(file_get_contents($pidfile));
+        $ppid = FileHelper::read($pidfile);
+        return intval($ppid);
     }
 
     public static function writePpid(int $ppid)
     {
         $common = static::readCommon();
         $pidfile = $common['pidfile'];
-        return file_put_contents($pidfile, $ppid);
+        // return file_put_contents($pidfile, $ppid);
+        return FileHelper::write($pidfile, $ppid);
     }
 
     public static function getConsumerFile()
@@ -242,7 +245,7 @@ class AmqpIni
             static::addLog($realpath . ' : realpath no such file', BaseLogger::ERROR);
             return false;
         }
-        return $realpath;
+        return realpath($realpath);
     }
 
     public static function checkProcessAlive($pid)

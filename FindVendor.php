@@ -1,7 +1,7 @@
 <?php
 // 找到verdor的绝对路径
 
-
+use pzr\amqp\cli\helper\FileHelper;
 
 $vendor_path = __DIR__ . '/Vendor.php';
 if (is_file($vendor_path)) {
@@ -23,7 +23,8 @@ foreach ($dirs as $dir) {
 // vendor的绝对路径
 return '$basePath';
 STR;
-        file_put_contents($vendor_path, $content);
+        // file_put_contents($vendor_path, $content);
+        FileHelper::write($vendor_path, $content, FileHelper::FILE_NORMAL);
         return $basePath;
     }
 }

@@ -72,8 +72,13 @@ class ProcessHelper
 
     public static function write(string $string, $append = false)
     {
-        $flag = $append ? FILE_APPEND : 0;
-        return file_put_contents(AmqpIni::getProcessFile(), $string, $flag);
+        $mode = $append ? FileHelper::FILE_APPEND : FileHelper::FILE_NORMAL;
+        // return file_put_contents(AmqpIni::getProcessFile(), $string, $flag);
+        return FileHelper::write(
+            AmqpIni::getProcessFile(),
+            $string,
+            $mode
+        );
     }
 
     public static function flush()
