@@ -3,7 +3,7 @@
 /frontend/runtime/
 /frontend/models/MyUser.php
 /frontend/.DS_Store
-/frontend/web/assets/
+/frontend/web/assets/*
 /src/runtime/
 /src/.DS_Store
 /src/cli/log/
