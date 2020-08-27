@@ -4,6 +4,7 @@ namespace pzr\amqp\cli\handler;
 
 use Exception;
 use Pheanstalk\Pheanstalk;
+use pzr\amqp\cli\helper\AmqpIni;
 use pzr\amqp\cli\helper\ProcessHelper;
 
 class BeanstalkHandler extends BaseHandler
@@ -13,11 +14,15 @@ class BeanstalkHandler extends BaseHandler
     public function __construct(array $config)
     {
         parent::__construct($config);
-        isset($config['host']) or exit('invalid value : [beanstalk][host]');
-        isset($config['port']) or exit('invalid value : [beanstalk][port]');
-        $host = $config['host'];
-        $port = $config['port'];
-        $this->talker = Pheanstalk::create($host, $port);
+        isset($config['host']) or AmqpIni::exit('invalid value : [beanstalk][host]');
+        isset($config['port']) or AmqpIni::exit('invalid value : [beanstalk][port]');
+        $this->talker = Pheanstalk::create(
+            $config['host'],
+            $config['port']
+        );
+        if (empty($this->talker)) {
+            AmqpIni::exit('create beanstalk failed');
+        }
     }
 
     public function addQueue(int $pid, int $ppid, string $queue, string $program)

@@ -2,6 +2,7 @@
 
 namespace pzr\amqp\cli\handler;
 
+use pzr\amqp\cli\helper\AmqpIni;
 use pzr\amqp\cli\helper\ProcessHelper;
 
 class RedisHandler extends BaseHandler
@@ -14,6 +15,10 @@ class RedisHandler extends BaseHandler
         $this->redis = new \Redis();
         $this->redis->connect($config['host'], $config['port']);
         $this->redis->auth($config['password']);
+
+        if (empty($this->redis)) {
+            AmqpIni::exit('create redis failed');
+        }
     }
 
     public function addQueue(int $pid, int $ppid, string $queue, string $program)
