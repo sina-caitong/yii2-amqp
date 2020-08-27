@@ -9,8 +9,6 @@ use pzr\amqp\cli\Consumer;
 use pzr\amqp\cli\helper\ProcessHelper;
 use pzr\amqp\cli\logger\Logger;
 
-@is_dir('/usr/local/var/run') ?: mkdir('/usr/local/var/run', 0777, true);
-
 defined('DEFALUT_AMQPINI_PATH') or define('DEFALUT_AMQPINI_PATH', __DIR__ . '/../config/amqp.ini');
 defined('DEFAULT_PIDFILE_PATH') or define('DEFAULT_PIDFILE_PATH', '/usr/local/var/run/amqp_master.pid');
 defined('DEFAULT_PROCESS_PATH') or define('DEFAULT_PROCESS_PATH', __DIR__ . '/../config/process_manager.ini');
