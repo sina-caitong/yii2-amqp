@@ -24,7 +24,7 @@ class FileHelper
 
     public static function read($file, $mode = self::FILE_READ)
     {
-        if (empty(filesize($file))) return '';
+        if (empty(@filesize($file))) return '';
         $fd = fopen($file, $mode);
         $data = fread($fd, filesize($file));
         fclose($fd);
