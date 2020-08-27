@@ -225,6 +225,9 @@ class AmqpForm extends Model
         $talker = Pheanstalk::create($beanstalk['host'], $beanstalk['port']);
         $isBeanstalkActive = empty($talker) ? false : true;
 
+        $handler = $array['handler']['class'];
+        $commun = $array['communication']['class'];
+
         $parseIni = <<<EOF
 【default】
 default_access_log = $default_access_log 【is_writable: $is_default_access_log_writable is_readable: $is_default_access_log_readable 】
@@ -241,6 +244,10 @@ process_file = $process_file  【is_writable: $is_process_file_writable is_reada
 isAmqpActive = $isAmqpConn
 isRedisActive = $isRedisActive
 isBeanstalkActive = $isBeanstalkActive
+
+【select】
+handle.class = $handler
+commun.class = $commun
 EOF;
 
 
