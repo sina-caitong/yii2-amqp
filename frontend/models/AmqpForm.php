@@ -198,6 +198,14 @@ class AmqpForm extends Model
         $is_process_file_writable = is_writable($process_file);
         $is_process_file_readable = is_readable($process_file);
 
+        $default_access_log = DEFAULT_ACCESS_LOG;
+        $is_default_access_log_writable = is_writable(DEFAULT_ACCESS_LOG);
+        $is_default_access_log_readable = is_readable(DEFAULT_ACCESS_LOG);
+
+        $default_error_log = DEFAULT_ERROR_LOG;
+        $is_default_error_log_writable = is_writable(DEFAULT_ERROR_LOG);
+        $is_default_error_log_readable = is_readable(DEFAULT_ERROR_LOG);
+
         
         $amqp = $array['amqp'];
         $redis = $array['redis'];
@@ -218,6 +226,10 @@ class AmqpForm extends Model
         $isBeanstalkActive = empty($talker) ? false : true;
 
         $parseIni = <<<EOF
+【default】
+default_access_log = $default_access_log 【is_writable: $is_default_access_log_writable is_readable: $is_default_access_log_readable 】
+default_error_log = $default_error_log 【is_writable: $is_default_error_log_writable is_readable: $is_default_error_log_readable 】
+
 【check file】
 access_log = $access_log  【is_writable: $is_access_log_writable is_readable: $is_access_log_readable 】
 error_log = $error_log  【is_writable: $is_error_log_writable is_readable: $is_error_log_readable 】
