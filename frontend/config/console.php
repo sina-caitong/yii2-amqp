@@ -32,7 +32,7 @@ $config = [
             ],
         ],
         'db' => $db,
-        // 'consumer' => $amqp['consumer'],
+        'consumer' => $amqp['consumer'],
     ],
     'params' => $params,
     /*
