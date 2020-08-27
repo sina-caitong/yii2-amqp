@@ -49,6 +49,7 @@ class Command
     {
         $input = trim(strtolower($input));
         list($command, $pid) = explode('|', $input);
+        $this->logger->addLog('dispatch command: ' . $command, BaseLogger::DEBUG);
         if (!in_array($command, $this->_commands)) {
             $notice = 'avaliable commands are :' . implode('|', $this->_commands);
             $this->logger->addLog($notice, BaseLogger::NOTICE);
