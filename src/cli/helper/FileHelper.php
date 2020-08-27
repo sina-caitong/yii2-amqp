@@ -15,7 +15,7 @@ class FileHelper
 
     public static function write($file, string $data, $mode = self::FILE_NORMAL)
     {
-        umask(0);
+        umask();
         $fd = fopen($file, $mode);
         $size = fwrite($fd, $data, strlen($data));
         fclose($fd);
@@ -24,7 +24,7 @@ class FileHelper
 
     public static function read($file, $mode = self::FILE_READ)
     {
-        umask(0);
+        umask();
         if (empty(filesize($file))) return '';
         $fd = fopen($file, $mode);
         $data = fread($fd, filesize($file));
