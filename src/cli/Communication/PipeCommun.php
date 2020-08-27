@@ -28,11 +28,9 @@ class PipeCommun extends BaseCommun
 
     public function read()
     {
-        $size = filesize($this->pipe_file);
-        if (empty($size)) return false;
-        
         $buffer = FileHelper::read($this->pipe_file);
         $this->logger->addLog(sprintf("[pipe] read buffer: %s", $buffer));
+        if (empty($buffer)) return '';
         $array = explode('|', $buffer);
         $data = array();
         foreach ($array as $k => $v) {
