@@ -64,7 +64,7 @@ class LoginForm extends Model
             AmqpIni::addLog(sprintf("IP:%s, username:%s, login succ", $_SERVER['REMOTE_ADDR'], $this->username));
             return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
         }
-        
+
         AmqpIni::addLog(sprintf("IP:%s, username:%s, login failed:%d", $_SERVER['REMOTE_ADDR'], $this->username, 1));
         return false;
     }
@@ -78,7 +78,7 @@ class LoginForm extends Model
     {
         if ($this->_user === false) {
 
-            $this->_user = class_exists(MyUser::class) ? MyUser::findByUsername($this->username)
+            $this->_user = file_exists(__DIR__ . '/MyUser.php') ? MyUser::findByUsername($this->username)
                 : MyUser::findByUsername($this->username);
         }
         return $this->_user;
