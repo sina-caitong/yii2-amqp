@@ -2,10 +2,13 @@
 
 namespace app\models;
 
+use Exception;
+use Pheanstalk\Pheanstalk;
 use pzr\amqp\Amqp;
 use pzr\amqp\api\AmqpApi;
 use pzr\amqp\cli\Consumer;
 use pzr\amqp\cli\helper\AmqpIni;
+use pzr\amqp\cli\helper\FileHelper;
 use pzr\amqp\cli\helper\ProcessHelper;
 use yii\base\Model;
 
@@ -171,5 +174,66 @@ class AmqpForm extends Model
             $color .= $array[mt_rand(0, count($array) - 1)];
         }
         return ''; //$color;
+    }
+
+    public function getAmqpIni() {
+        $array = AmqpIni::readIni();
+        $access_log = AmqpIni::findRealpath($array['common']['access_log']);
+        $is_access_log_writable = is_writeable($access_log);
+        $is_access_log_readable = is_readable($access_log);
+
+        $error_log = AmqpIni::findRealpath($array['common']['error_log']);
+        $is_error_log_writable = is_writeable($error_log);
+        $is_error_log_readable = is_readable($error_log);
+
+        $pipe_file = AmqpIni::findRealpath($array['pipe']['pipe_file']);
+        $is_pipe_writable = is_writable($pipe_file);
+        $is_pipe_readable = is_readable($pipe_file);
+
+        $pidfile = AmqpIni::findRealpath($array['common']['pidfile']);
+        $is_pidfile_writable = is_writable($pidfile);
+        $is_pidfile_readable = is_readable($pidfile);
+
+        $process_file = AmqpIni::findRealpath($array['common']['process_file']);
+        $is_process_file_writable = is_writable($process_file);
+        $is_process_file_readable = is_readable($process_file);
+
+        
+        $amqp = $array['amqp'];
+        $redis = $array['redis'];
+        $beanstalk = $array['beanstalk'];
+
+        $isAmqpConn = (new AmqpApi($amqp))->checkActive();
+
+        try {
+            $redisObj = new \Redis();
+            $redisObj->connect($redis['host'], $redis['port']);
+            $redisObj->auth($redis['password']);
+        } catch (Exception $e) {
+            $redisObj = null;
+        }
+        $isRedisActive = empty($redisObj) ? false : true;
+
+        $talker = Pheanstalk::create($beanstalk['host'], $beanstalk['port']);
+        $isBeanstalkActive = empty($talker) ? false : true;
+
+        $parseIni = <<<EOF
+【check file】
+access_log = $access_log  【is_writable: $is_access_log_writable is_readable: $is_access_log_readable 】
+error_log = $error_log  【is_writable: $is_error_log_writable is_readable: $is_error_log_readable 】
+pipe_file = $pipe_file  【is_writable: $is_pipe_writable is_readable: $is_pipe_readable 】
+pidfile = $pidfile  【is_writable: $is_pidfile_writable is_readable: $is_pidfile_readable 】
+process_file = $process_file  【is_writable: $is_process_file_writable is_readable: $is_process_file_readable 】
+
+【check connection】
+isAmqpActive = $isAmqpConn
+isRedisActive = $isRedisActive
+isBeanstalkActive = $isBeanstalkActive
+EOF;
+
+
+        $sourceIni = FileHelper::read(DEFALUT_AMQPINI_PATH);
+
+        return [$sourceIni, $parseIni];
     }
 }

@@ -39,8 +39,9 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => 'Home', 'url' => ['/amqp/index']],
-            ['label' => 'Tag', 'url' => ['/amqp/stat']],
+            ['label' => 'Conn', 'url' => ['/amqp/stat']],
             ['label' => 'Logger', 'url' => ['/amqp/log']],
+            ['label' => 'amqp.ini', 'url' => ['/amqp/ini']],
             Yii::$app->user->isGuest ? (
                 ['label' => 'Login', 'url' => ['/amqp/login']]
             ) : (

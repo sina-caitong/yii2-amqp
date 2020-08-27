@@ -134,4 +134,11 @@ class AmqpController extends Controller
         }
         return true;
     }
+
+    public function actionIni() {
+        $model = new AmqpForm();
+        return $this->render('ini', [
+            'model' => $model,
+        ]);
+    }
 }
