@@ -16,8 +16,7 @@ class Client
         );
         $socket = socket_create(AF_UNIX, SOCK_STREAM, 0);
         if (!socket_connect($socket, AmqpIni::getUnix())) {
-            AmqpIni::addLog('Client connect Serve failed');
-            exit(2);
+            AmqpIni::exit('Client connect Serve failed');
         }
         try {
             $ret = socket_write($socket, $command, strlen($command));
