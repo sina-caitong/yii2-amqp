@@ -15,7 +15,7 @@ class FileHelper
 
     public static function write($file, string $data, $mode = self::FILE_NORMAL)
     {
-        chmod($file, 0777);
+        @chmod($file, 0777);
         $fd = fopen($file, $mode);
         $size = fwrite($fd, $data, strlen($data));
         fclose($fd);
