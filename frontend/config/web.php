@@ -54,8 +54,8 @@ $config = [
             ],
         ],
         'db' => $db,
-        'easyQueue' => $amqp['easyQueue'],
-        'rpcQueue' => $amqp['rpcQueue'],
+        // 'easyQueue' => $amqp['easyQueue'],
+        // 'rpcQueue' => $amqp['rpcQueue'],
         
         /*
         'urlManager' => [
