@@ -8,7 +8,7 @@
 /src/.DS_Store
 /src/cli/log/
 /src/cli/tests/
-/src/cli/config/consumer/*
+/src/cli/config/consumer/
 /src/cli/config/amqp.ini
 /src/cli/config/process_manager.ini
 /runtime/

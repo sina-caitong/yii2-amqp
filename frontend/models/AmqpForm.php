@@ -77,7 +77,7 @@ class AmqpForm extends Model
             'ack' => false,
             'connections' => []
         ];
-        $queueArray = [];
+        $queueArray = $consumerArray = [];
 
         foreach ($files as $file) {
             $config = parse_ini_file($file);

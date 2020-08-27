@@ -295,7 +295,7 @@ class AmqpIni
 
     public static function exit($error)
     {
-        static::addLog('line: ' . __LINE__ . ' ' . $error, BaseLogger::ERROR);
+        static::addLog($error, BaseLogger::ERROR);
         exit($error);
     }
 
