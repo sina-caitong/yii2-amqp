@@ -220,7 +220,7 @@ class AmqpIni
             return false;
         }
         if (strncmp($filepath, '.', 1)) {
-            if ($touch && !is_file($filepath) && !@touch($filepath)) {
+            if ($touch && !is_file($filepath) && !touch($filepath)) {
                 static::addLog($filepath . ' touch failed', BaseLogger::ERROR);
                 return false;
             }
@@ -283,7 +283,7 @@ class AmqpIni
     {
         $common = static::readCommon();
         $pipe_file = $common['pipe_file'] ?: '/tmp/amqp_pipe';
-        @touch($pipe_file) or static::exit($pipe_file . ' : pipe no such file');
+        touch($pipe_file) or static::exit($pipe_file . ' : pipe no such file');
         return true;
     }
 
