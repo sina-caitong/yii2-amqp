@@ -209,10 +209,16 @@ class AmqpForm extends Model
         $unix = AmqpIni::findRealpath($array['common']['unix']);
         $socket = socket_create(AF_UNIX, SOCK_STREAM, 0);
         $isConn = 0;
-        if (socket_connect($socket, $unix)) {
-            $isConn = true;
-            socket_close($socket);
+        $error = '';
+        try {
+            if (socket_connect($socket, $unix)) {
+                $isConn = true;
+                socket_close($socket);
+            }
+        } catch(Exception $e) {
+            $error = $e->getMessage();
         }
+        
         
         $amqp = $array['amqp'];
         $redis = $array['redis'];
@@ -250,6 +256,7 @@ process_file = $process_file  【is_writable: $is_process_file_writable is_reada
 【server】
 unix = $unix
 isConn = $isConn
+error = $error
 
 【check connection】
 isAmqpActive = $isAmqpConn
