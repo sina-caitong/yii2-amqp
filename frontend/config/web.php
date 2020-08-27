@@ -30,7 +30,7 @@ $config = [
             'class' => 'yii\caching\FileCache',
         ],
         'user' => [
-            'identityClass' => is_file(dirname(__DIR__).'/models/MyUser.php') ? 'app\models\MyUser' : 'app\models\User',
+            'identityClass' => 'app\models\User',
             // 'identityClass' => 'app\models\MyUser',
             'enableAutoLogin' => true,
         ],

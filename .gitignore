@@ -1,7 +1,7 @@
 /vendor/
 /frontend/config/MY_amqp.php
 /frontend/runtime/
-/frontend/models/MyUser.php
+/frontend/config/user.php
 /frontend/.DS_Store
 /frontend/web/assets/*
 /src/runtime/
