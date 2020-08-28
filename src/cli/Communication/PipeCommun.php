@@ -36,7 +36,7 @@ class PipeCommun extends BaseCommun
         foreach ($array as $k => $v) {
             if (empty($v)) continue;
             $arr = explode(',', $v);
-            if (!is_array($arr) || !isset($arr['queueName']) || !isset($arr['program'])) continue;
+            if (!is_array($arr)) continue;
             $data[] = $arr;
         }
         return $data;
