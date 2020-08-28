@@ -5,17 +5,14 @@
 /* @var $model app\models\LoginForm */
 
 use yii\helpers\Html;
-use yii\bootstrap\ActiveForm;
 
-$this->title = 'AMQP CONSUMER TAG MANAGER';
+$this->title = 'AMQP CONSUMER CONN MANAGER';
 $this->params['breadcrumbs'][] = $this->title;
 
 $stat = $model->statV2();
 ?>
 <div class="" style="text-align: center;">
     <h1><?= Html::encode($this->title) ?></h1>
-
-
 
     <?php foreach ($stat as $queue => $d) { ?>
         <table class="hovertable" style="width: 80%; margin-left:10%;">

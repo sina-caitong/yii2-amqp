@@ -15,6 +15,30 @@ use yii\base\Model;
 class AmqpForm extends Model
 {
 
+    private $colors = array(
+        '#8B008B', //深洋红色
+        '#FF1493', //深粉色
+        '#DC143C', //猩红
+        '#8A2BE2', //深紫罗兰的蓝色
+        '#0000FF', //纯蓝
+        '#5F9EA0', //军校蓝
+        '#228B22', //森林绿
+        '#808000', //橄榄
+        '#FFA500', //橙色
+        '#8B4513', //马鞍棕色
+        '#696969', //暗淡的灰色
+        '#2F4F4F', //深石板灰
+        '#3CB371', //春天的绿色
+        '#2E8B57', //海洋绿
+        '#008000', //纯绿
+        '#556B2F', //橄榄土褐色
+        '#DEB887', //结实的树
+        '#A0522D', //黄土赭色
+        // more 随机颜色
+    );
+
+    private $colorUseds = [];
+
     public function traceLog($limit = 100)
     {
         list($access_log, $error_log, $level) = AmqpIni::getDefaultLogger();
@@ -159,7 +183,7 @@ class AmqpForm extends Model
             ];
         }
 
-        uksort($stat, function ($a, $b) {
+        uasort($stat, function ($a, $b) {
             return $a == $b ? 0 : ($a > $b ? 1 : -1);
         });
 
@@ -168,15 +192,24 @@ class AmqpForm extends Model
 
     public function getColor()
     {
+        $len = count($this->colors);
+        if ($len > 0) {
+            $index = array_rand($this->colors);
+            $color = $this->colors[$index];
+            unset($this->colors[$index]);
+            return $color;
+        }
+
         $array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F'];
         $color = '#';
         for ($i = 0; $i < 6; $i++) {
             $color .= $array[mt_rand(0, count($array) - 1)];
         }
-        return ''; //$color;
+        return $color;
     }
 
-    public function getAmqpIni() {
+    public function getAmqpIni()
+    {
         $array = AmqpIni::readIni();
         $access_log = AmqpIni::findRealpath($array['common']['access_log']);
         $is_access_log_writable = is_writeable($access_log);
@@ -215,11 +248,11 @@ class AmqpForm extends Model
                 $isConn = true;
                 socket_close($socket);
             }
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $error = $e->getMessage();
         }
-        
-        
+
+
         $amqp = $array['amqp'];
         $redis = $array['redis'];
         $beanstalk = $array['beanstalk'];
