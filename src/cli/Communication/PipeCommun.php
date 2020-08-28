@@ -30,6 +30,7 @@ class PipeCommun extends BaseCommun
     {
         $buffer = FileHelper::read($this->pipe_file);
         if (empty($buffer)) return '';
+        $this->flush();
         $this->logger->addLog(sprintf("[pipe] read buffer: %s", $buffer));
         $array = explode('|', $buffer);
         $data = array();
@@ -72,6 +73,6 @@ class PipeCommun extends BaseCommun
 
     public function flush()
     {
-        return unlink($this->pipe_file);
+        return @unlink($this->pipe_file);
     }
 }
