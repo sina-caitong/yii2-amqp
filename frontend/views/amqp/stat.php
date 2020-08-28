@@ -6,7 +6,7 @@
 
 use yii\helpers\Html;
 
-$this->title = 'AMQP CONSUMER CONN MANAGER';
+$this->title = 'CONSUMER CONNECTIONS MANAGER';
 $this->params['breadcrumbs'][] = $this->title;
 
 $stat = $model->statV2();

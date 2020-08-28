@@ -7,7 +7,7 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = 'AMQP LOGGER MANAGER';
+$this->title = 'LOGGER MANAGER';
 $this->params['breadcrumbs'][] = $this->title;
 $limit = isset($_GET['limit']) ? $_GET['limit'] : 20;
 $data = $model->traceLog($limit);

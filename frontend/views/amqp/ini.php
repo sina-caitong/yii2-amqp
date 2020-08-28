@@ -7,7 +7,7 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = 'AMQP AMQP.INI CHECK';
+$this->title = 'amqp.ini VIEW';
 $this->params['breadcrumbs'][] = $this->title;
 [$sourceIni, $parseIni] = $model->getAmqpIni();
 ?>

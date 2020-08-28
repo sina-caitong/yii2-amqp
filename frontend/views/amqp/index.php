@@ -7,7 +7,7 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = 'AMQP CONSUMER PROCESSER MANAGER';
+$this->title = 'CONSUMER PROCESS MANAGER';
 $this->params['breadcrumbs'][] = $this->title;
 
 [$list, $stat, $color] = $model->list();
