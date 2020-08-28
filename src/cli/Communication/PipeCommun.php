@@ -72,7 +72,6 @@ class PipeCommun extends BaseCommun
 
     public function flush()
     {
-        // return unlink($this->pipe_file);
-        return FileHelper::write($this->pipe_file, '');
+        return unlink($this->pipe_file);
     }
 }
