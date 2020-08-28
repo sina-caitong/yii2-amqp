@@ -12,6 +12,5 @@
 /src/cli/config/amqp.ini
 /src/cli/config/process_manager.ini
 /runtime/
-
+.DS_Store
 Vendor.php
-

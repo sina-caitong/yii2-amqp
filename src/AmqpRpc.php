@@ -147,11 +147,11 @@ class AmqpRpc extends Amqp
     /**
      * @inheritDoc
      */
-    public function consume($queueName, $qos = 1, $consumerTag = '')
+    public function consume($queueName, $qos = 1, $consumerTag = '', $noAck=false)
     {
         $this->open();
-        $callback = function (AMQPMessage $payload) {
-            $this->handleMessage($payload);
+        $callback = function (AMQPMessage $payload, $noAck) {
+            $this->handleMessage($payload, $noAck);
         };
         $this->channel->basic_qos(null, $qos, null);
         /** 开启自动ack，防止因为消息异常而导致一直无法消费成功 */
@@ -168,7 +168,7 @@ class AmqpRpc extends Amqp
      * @param AMQPMessage $payload
      * @return ExecEvent
      */
-    public function handleMessage(AMQPMessage $payload)
+    public function handleMessage(AMQPMessage $payload, $noAck)
     {
         $job = $this->serializer->unserialize($payload->getBody());
 
@@ -206,7 +206,14 @@ class AmqpRpc extends Amqp
             array('correlation_id' => $payload->get('correlation_id'))
         );
 
-        $payload->getChannel()->basic_publish(
+        // amqplib 1.2版本使用
+        // $payload->getChannel()->basic_publish(
+        //     $message,
+        //     '',
+        //     $payload->get('reply_to')
+        // );
+
+        $payload->delivery_info['channel']->basic_publish(
             $message,
             '',
             $payload->get('reply_to')

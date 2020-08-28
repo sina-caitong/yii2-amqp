@@ -354,7 +354,9 @@ class AmqpBase extends Component
     {
         $job = $this->serializer->unserialize($payload->getBody());
         if (!($job instanceof AmqpJob)) {
-            $noAck ?: $payload->nack(false);
+            // amqplib 1.2用法
+            // $noAck ?: $payload->nack(false);
+            $noAck ?: $payload->delivery_info['channel']->nack($payload->delivery_info['consumer_tag'], true);
             return false;
         }
 
@@ -363,9 +365,11 @@ class AmqpBase extends Component
         try {
             $event->result = $event->job->execute();
             if ($event->result !== false) {
-                $noAck ?: $payload->ack(true);
+                // $noAck ?: $payload->ack(true);
+                $noAck ?: $payload->delivery_info['channel']->ack($payload->delivery_info['consumer_tag'], true);
             } else {
-                $noAck ?: $payload->nack(true, true);
+                // $noAck ?: $payload->nack(true, true);
+                $noAck ?: $payload->delivery_info['channel']->nack($payload->delivery_info['consumer_tag'], true);
             }
         } catch (\Exception $error) {
             $event->error = $error;
