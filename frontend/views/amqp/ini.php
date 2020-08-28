@@ -13,10 +13,11 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="" style="text-align: left;">
     <h1><?= Html::encode($this->title) ?></h1>
-    <p><?= DEFALUT_AMQPINI_PATH ?></p>
+    <p>检测amqp.ini</p>
     <pre>
 <?= $parseIni ?>
     </pre>
+    <p><?= DEFALUT_AMQPINI_PATH ?></p>
     <pre style="height:auto;">
 <?= $sourceIni ?>
     </pre>
