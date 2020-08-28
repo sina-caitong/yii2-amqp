@@ -3,6 +3,7 @@
 namespace pzr\amqp\cli\logger;
 
 use Monolog\DateTimeImmutable;
+use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Logger;
 use pzr\amqp\cli\helper\AmqpIni;
@@ -23,6 +24,8 @@ class FileHandler implements HandlerInterface
         $this->error_log = $error_log;
         $this->level = $level;
     }
+
+    
 
     public function isHandling(array $record): bool
     {
@@ -61,13 +64,17 @@ class FileHandler implements HandlerInterface
             case Logger::WARNING:
             case Logger::NOTICE:
                 if (empty($access_log) || !is_file($access_log)) return false;
-                $content = sprintf("%s【%s】%s", $record['datetime'], $record['level_name'], $record['message']);
+                //~v2.0.0 为了满足开发机的5.6版本，降低了monolog的版本
+                // $content = sprintf("%s【%s】%s", $record['datetime'], $record['level_name'], $record['message']);
+                // v1.25.5 出现错误，$record['datetime']->date 输出了对象属性date却无法获取
+                // $content = sprintf("%s【%s】%s", $record['datetime']->date, $record['level_name'], $record['message']);
+                $content = sprintf("%s【%s】%s", date('Y-m-d H:i:s'), $record['level_name'], $record['message']);
                 @error_log($content . PHP_EOL, 3, $access_log);
                 break;
             case Logger::ERROR:
             case Logger::CRITICAL:
                 if (empty($error_log) || !is_file($error_log)) return false;
-                $content = sprintf("%s【%s】%s", $record['datetime'], $record['level_name'], $record['message']);
+                $content = sprintf("%s【%s】%s", date('Y-m-d H:i:s'), $record['level_name'], $record['message']);
                 @error_log($content . PHP_EOL, 3, $error_log);
                 break;
             // 邮件提醒
@@ -80,6 +87,26 @@ class FileHandler implements HandlerInterface
 
     public function close(): void
     {
+    }
+
+    public function pushProcessor($callback)
+    {
+        
+    }
+
+    public function popProcessor()
+    {
+        
+    }
+
+    public function getFormatter()
+    {
+        
+    }
+
+    public function setFormatter(FormatterInterface $formatter)
+    {
+        
     }
 
     public function handleBatch(array $records): void
