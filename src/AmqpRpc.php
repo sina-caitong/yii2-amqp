@@ -150,7 +150,7 @@ class AmqpRpc extends Amqp
     public function consume($queueName, $qos = 1, $consumerTag = '', $noAck=false)
     {
         $this->open();
-        $callback = function (AMQPMessage $payload, $noAck) {
+        $callback = function (AMQPMessage $payload) use ($noAck) {
             $this->handleMessage($payload, $noAck);
         };
         $this->channel->basic_qos(null, $qos, null);
