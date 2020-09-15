@@ -1,6 +1,6 @@
 <?php
 
-use pzr\amqp\cli\Dispatcher;
+use pzr\amqp\cli\command\Dispatcher;
 
 
 $baseDir = require dirname(__DIR__, 3) . '/FindVendor.php';

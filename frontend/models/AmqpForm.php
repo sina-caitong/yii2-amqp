@@ -51,17 +51,25 @@ class AmqpForm extends Model
         $beanstalk = $array['beanstalk'];
         $pipe = $array['pipe'];
 
-        $amqp_access_log = isset($amqp['access_log']) && $amqp['access_log'] != $access_log ? $amqp['access_log'] : '';
-        $amqp_error_log = isset($amqp['error_log']) && $amqp['error_log'] != $error_log ? $amqp['error_log'] : '';
+        $amqp_access_log = isset($amqp['access_log']) && $amqp['access_log'] != $access_log ?
+            $this->findRealPath($amqp['access_log']) : '';
+        $amqp_error_log = isset($amqp['error_log']) && $amqp['error_log'] != $error_log ?
+            $this->findRealPath($amqp['error_log']) : '';
 
-        $redis_access_log = isset($redis['access_log']) && $redis['access_log'] != $access_log ? $redis['access_log'] : '';
-        $redis_error_log = isset($redis['error_log']) && $redis['error_log'] != $error_log ? $redis['error_log'] : '';
+        $redis_access_log = isset($redis['access_log']) && $redis['access_log'] != $access_log ?
+            $this->findRealPath($redis['access_log']) : '';
+        $redis_error_log = isset($redis['error_log']) && $redis['error_log'] != $error_log ?
+            $this->findRealPath($redis['error_log']) : '';
 
-        $beanstalk_access_log = isset($beanstalk['access_log']) && $beanstalk['access_log'] != $access_log ? $beanstalk['access_log'] : '';
-        $beanstalk_error_log = isset($beanstalk['error_log']) && $beanstalk['error_log'] != $error_log ? $beanstalk['error_log'] : '';
+        $beanstalk_access_log = isset($beanstalk['access_log']) && $beanstalk['access_log'] != $access_log ?
+            $this->findRealPath($beanstalk['access_log']) : '';
+        $beanstalk_error_log = isset($beanstalk['error_log']) && $beanstalk['error_log'] != $error_log ?
+            $this->findRealPath($beanstalk['error_log']) : '';
 
-        $pipe_access_log = isset($pipe['access_log']) && $pipe['access_log'] != $access_log ? $pipe['access_log'] : '';
-        $pipe_error_log = isset($pipe['error_log']) && $pipe['error_log'] != $error_log ? $pipe['error_log'] : '';
+        $pipe_access_log = isset($pipe['access_log']) && $pipe['access_log'] != $access_log ?
+            $this->findRealPath($pipe['access_log']) : '';
+        $pipe_error_log = isset($pipe['error_log']) && $pipe['error_log'] != $error_log ?
+            $this->findRealPath($pipe['error_log']) : '';
 
         return [
             'level' => $level,
@@ -86,6 +94,7 @@ class AmqpForm extends Model
             $path = str_replace(['%Y', '%y', '%m', '%d'], [date('Y'), date('y'), date('m'), date('d')], $path);
             $path = AmqpIniHelper::findRealpath($path);
         }
+        $path = realpath($path);
         return $path;
     }
 

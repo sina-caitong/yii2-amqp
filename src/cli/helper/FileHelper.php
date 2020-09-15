@@ -20,11 +20,10 @@ class FileHelper
         if (!is_resource($fd)) {
             $flag = @chmod($file, 0755);
             if ($flag === false) {
-                @unlink($file) and @touch($file) and @chmod($file, 0755);
-                AmqpIniHelper::addLog($file . ' chmod 0755 failed', Logger::ERROR);
+                AmqpIniHelper::exit($file . ' chmod 0755 failed', Logger::ERROR);
             }
             $fd = fopen($file, $mode);
-            is_resource($fd) or AmqpIniHelper::addLog($file . ' fopen failed', Logger::ERROR);
+            is_resource($fd) or AmqpIniHelper::exit($file . ' fopen failed', Logger::ERROR);
             return false;
         }
         $size = fwrite($fd, $data, strlen($data));

@@ -14,3 +14,5 @@
 /runtime/
 .DS_Store
 Vendor.php
+/src/cli/.DS_Store
+/.vscode/

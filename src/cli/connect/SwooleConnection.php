@@ -3,7 +3,8 @@
 
 namespace pzr\amqp\cli\connect;
 
-use pzr\amqp\cli\Command;
+use pzr\amqp\cli\command\Command;
+use pzr\amqp\cli\command\SwooleCommand;
 use pzr\amqp\cli\helper\AmqpIniHelper;
 
 class SwooleConnection implements ConnectionInterface
@@ -15,7 +16,7 @@ class SwooleConnection implements ConnectionInterface
     public function __construct($host)
     {
         $this->server = new \Swoole\Server($host, $port = 0, $mode = SWOOLE_PROCESS, $sock_type = SWOOLE_UNIX_STREAM);
-        $this->command = new Command();
+        $this->command = new SwooleCommand();
     }
 
     public function start()

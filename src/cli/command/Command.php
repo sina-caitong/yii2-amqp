@@ -1,51 +1,16 @@
 <?php
 
-namespace pzr\amqp\cli;
+namespace pzr\amqp\cli\command;
 
-use Exception;
 use Monolog\Logger as BaseLogger;
 use pzr\amqp\cli\communication\CommunFactory;
-use pzr\amqp\cli\handler\HandlerFactory;
 use pzr\amqp\cli\helper\AmqpIniHelper;
 use pzr\amqp\cli\helper\ProcessHelper;
 use pzr\amqp\cli\helper\SignoHelper;
 use pzr\amqp\cli\logger\Logger;
 
-class Command
+class Command extends BaseCommand implements CommandInterface
 {
-    const STOP = 'stop';
-    const RESTART = 'restart';
-    const START_ALL = 'startall';
-    const STOP_ALL = 'stopall';
-    const RELOAD_ALL = 'reloadall';
-    const COPY = 'copy';
-
-    private $_commands = [
-        self::STOP,
-        self::RESTART,
-        self::START_ALL,
-        self::STOP_ALL,
-        self::RELOAD_ALL,
-        self::COPY,
-    ];
-
-    /** @var \pzr\amqp\cli\handler\BaseHandler */
-    private $handler = null;
-    /** @var Logger */
-    private $logger = null;
-    /** @var \pzr\amqp\cli\communication\CommunInterface */
-    private $commun = null;
-    private $childs = array();
-    private $end = false;
-
-    public function __construct()
-    {
-        $this->handler = HandlerFactory::getHandler();
-        $this->commun = CommunFactory::getInstance();
-        $this->logger = AmqpIniHelper::getLogger();
-    }
-
-
     public function dispatch($input)
     {
         $input = trim(strtolower($input));
@@ -63,23 +28,23 @@ class Command
         }
         switch ($command) {
             case self::COPY:
-                return $this->handleCopy($pid);
+                return $this->copyOne($pid);
             case self::STOP:
-                return $this->handleStop($pid);
+                return $this->stopOne($pid);
             case self::RESTART:
-                return $this->handleRestart($pid);
+                return $this->reloadOne($pid);
             case self::START_ALL:
-                return $this->handleStartAll();
+                return $this->startAll();
             case self::STOP_ALL:
-                return $this->handleStopAll();
+                return $this->stopAll();
             case self::RELOAD_ALL:
-                return $this->handleReloadAll();
+                return $this->reloadAll();
             default:
                 break;
         }
     }
 
-    protected function handleStartAll()
+    public function startAll()
     {
         $this->end = false;
         pcntl_signal(SIGCHLD, function ($signo, $siginfo) {
@@ -108,11 +73,10 @@ class Command
         }
     }
 
-    protected function handleStopAll()
+    protected function stopAll()
     {
         ProcessHelper::killAll();
-        $handler = CommunFactory::getInstance();
-        $handler->flush();
+        $this->commun->flush();
         return true;
     }
 
@@ -121,7 +85,7 @@ class Command
      *
      * @return bool
      */
-    protected function handleReloadAll()
+    protected function reloadAll()
     {
         $array = ProcessHelper::read();
         $domain = AmqpIniHelper::readPpid();
@@ -136,7 +100,7 @@ class Command
     }
 
 
-    protected function handleCopy($pid)
+    protected function copyOne($pid)
     {
         $ppid = AmqpIniHelper::readPpid();
         if (empty($ppid)) {
@@ -158,13 +122,13 @@ class Command
         return true;
     }
 
-    protected function handleRestart($pid)
+    protected function reloadOne($pid)
     {
         $this->logger->addLog(sprintf("[handleRestart] kill -%d %d", SignoHelper::KILL_CHILD_RELOAD, $pid));
         return posix_kill($pid, SignoHelper::KILL_CHILD_RELOAD);
     }
 
-    protected function handleStop($pid)
+    protected function stopOne($pid)
     {
         $this->logger->addLog(sprintf("[handleStop] kill -%d %d", SignoHelper::KILL_CHILD_STOP, $pid));
         return posix_kill($pid, SignoHelper::KILL_CHILD_STOP);
