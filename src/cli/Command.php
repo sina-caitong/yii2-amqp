@@ -2,10 +2,11 @@
 
 namespace pzr\amqp\cli;
 
+use Exception;
 use Monolog\Logger as BaseLogger;
-use pzr\amqp\cli\Communication\CommunFactory;
+use pzr\amqp\cli\communication\CommunFactory;
 use pzr\amqp\cli\handler\HandlerFactory;
-use pzr\amqp\cli\helper\AmqpIni;
+use pzr\amqp\cli\helper\AmqpIniHelper;
 use pzr\amqp\cli\helper\ProcessHelper;
 use pzr\amqp\cli\helper\SignoHelper;
 use pzr\amqp\cli\logger\Logger;
@@ -32,7 +33,7 @@ class Command
     private $handler = null;
     /** @var Logger */
     private $logger = null;
-    /** @var \pzr\amqp\cli\Communication\CommunInterface */
+    /** @var \pzr\amqp\cli\communication\CommunInterface */
     private $commun = null;
     private $childs = array();
     private $end = false;
@@ -41,7 +42,7 @@ class Command
     {
         $this->handler = HandlerFactory::getHandler();
         $this->commun = CommunFactory::getInstance();
-        $this->logger = AmqpIni::getLogger();
+        $this->logger = AmqpIniHelper::getLogger();
     }
 
 
@@ -92,12 +93,13 @@ class Command
         });
         $pid = pcntl_fork();
         if ($pid < 0) {
-            exit();
+            exit(0);
         } elseif ($pid > 0) {
             $this->childs[] = $pid;
         } else {
             $path = __DIR__ . '/run/ExecDispatcher.php';
-            pcntl_exec(AmqpIni::getCommand(), [$path]);
+            pcntl_exec(AmqpIniHelper::getCommand(), [$path])
+                or $this->logger->addLog('shell exec error' ,BaseLogger::ERROR);
             // shell_exec($cmd); //生成的子进程ID无法捕捉
             exit(0);
         }
@@ -109,6 +111,8 @@ class Command
     protected function handleStopAll()
     {
         ProcessHelper::killAll();
+        $handler = CommunFactory::getInstance();
+        $handler->flush();
         return true;
     }
 
@@ -120,8 +124,8 @@ class Command
     protected function handleReloadAll()
     {
         $array = ProcessHelper::read();
-        $domain = AmqpIni::readPpid();
-        $isAlive = AmqpIni::checkProcessAlive($domain);
+        $domain = AmqpIniHelper::readPpid();
+        $isAlive = AmqpIniHelper::checkProcessAlive($domain);
         foreach ($array as $v) {
             list($pid, $ppid, $queueName, $program) = $v;
             $signo = $isAlive && $ppid == $domain ?  SignoHelper::KILL_CHILD_RELOAD : SignoHelper::KILL_CHILD_STOP;
@@ -134,7 +138,7 @@ class Command
 
     protected function handleCopy($pid)
     {
-        $ppid = AmqpIni::readPpid();
+        $ppid = AmqpIniHelper::readPpid();
         if (empty($ppid)) {
             $this->logger->addLog(
                 sprintf("pid:%d, ppid:%d", $pid, $ppid), BaseLogger::NOTICE

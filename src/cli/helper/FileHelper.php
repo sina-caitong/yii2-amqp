@@ -16,15 +16,15 @@ class FileHelper
 
     public static function write($file, string $data, $mode = self::FILE_NORMAL)
     {
-
         $fd = fopen($file, $mode);
         if (!is_resource($fd)) {
             $flag = @chmod($file, 0755);
             if ($flag === false) {
-                AmqpIni::addLog($file . ' chmod 0755 failed', Logger::ERROR);
+                @unlink($file) and @touch($file) and @chmod($file, 0755);
+                AmqpIniHelper::addLog($file . ' chmod 0755 failed', Logger::ERROR);
             }
             $fd = fopen($file, $mode);
-            is_resource($fd) or AmqpIni::addLog($file . ' fopen failed');
+            is_resource($fd) or AmqpIniHelper::addLog($file . ' fopen failed', Logger::ERROR);
             return false;
         }
         $size = fwrite($fd, $data, strlen($data));

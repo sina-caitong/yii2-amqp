@@ -5,9 +5,9 @@ namespace pzr\amqp\cli;
 use Exception;
 use Monolog\Logger as BaseLogger;
 use pzr\amqp\Amqp;
-use pzr\amqp\cli\Communication\CommunFactory;
+use pzr\amqp\cli\communication\CommunFactory;
 use pzr\amqp\cli\handler\HandlerFactory;
-use pzr\amqp\cli\helper\AmqpIni;
+use pzr\amqp\cli\helper\AmqpIniHelper;
 use pzr\amqp\cli\helper\ProcessHelper;
 use pzr\amqp\cli\helper\SignoHelper;
 use pzr\amqp\cli\logger\Logger;
@@ -24,7 +24,7 @@ class Dispatcher
     // protected $end = false;
     /** @var \pzr\amqp\cli\handler\HandlerInterface 进程文件管理 */
     protected $handler = null;
-    /** @var \pzr\amqp\cli\Communication\CommunInterface 进程通信 */
+    /** @var \pzr\amqp\cli\communication\CommunInterface 进程通信 */
     protected $commun;
     /** @var Logger */
     protected $logger;
@@ -33,10 +33,10 @@ class Dispatcher
 
     public function __construct()
     {
-        $this->consumers = AmqpIni::parseIni();
+        $this->consumers = AmqpIniHelper::parseIni();
         $this->handler = HandlerFactory::getHandler();
         $this->commun = CommunFactory::getInstance();
-        $this->logger = AmqpIni::getLogger();
+        $this->logger = AmqpIniHelper::getLogger();
     }
 
     public function run()
@@ -58,7 +58,7 @@ class Dispatcher
         }
         @cli_set_process_title('AMQP Master Process');
         // 将主进程ID写入文件
-        AmqpIni::writePpid(getmypid());
+        AmqpIniHelper::writePpid(getmypid());
         // 父进程死亡回收所有的子进程
         // $this->installSignoHandler();
 
@@ -69,6 +69,7 @@ class Dispatcher
         }
         unset($this->consumers);
 
+        $this->commun->flush();
         // master进程继续
         while (true) {
             pcntl_signal_dispatch();
@@ -134,7 +135,7 @@ class Dispatcher
         if (isset($this->uniq_consumers[$key])) {
             return $this->uniq_consumers[$key];
         }
-        $config = AmqpIni::getConsumersByProgram($program);
+        $config = AmqpIniHelper::getConsumersByProgram($program);
         $config['queueName'] = $queueName;
         $config['duplicate'] = 1;
         $config['numprocs'] = 1;
@@ -158,8 +159,8 @@ class Dispatcher
      */
     private function _notifyMaster()
     {
-        $ppid = AmqpIni::readPpid();
-        $isAlive = AmqpIni::checkProcessAlive($ppid);
+        $ppid = AmqpIniHelper::readPpid();
+        $isAlive = AmqpIniHelper::checkProcessAlive($ppid);
         if (!$isAlive) return false;
         $this->logger->addLog('ppid:' . $ppid . ' is alive', BaseLogger::NOTICE);
         $queues = array();
@@ -204,7 +205,7 @@ class Dispatcher
             $c->qos
         ];
         @cli_set_process_title('AMQP worker consmer');
-        $flag = pcntl_exec(AmqpIni::getCommand(), $args);
+        $flag = pcntl_exec(AmqpIniHelper::getCommand(), $args);
         if ($flag === false) {
             exit(1);
         }

@@ -3,7 +3,7 @@
 namespace pzr\amqp\cli;
 
 use Monolog\Logger;
-use pzr\amqp\cli\helper\AmqpIni;
+use pzr\amqp\cli\helper\AmqpIniHelper;
 use yii\base\BaseObject;
 
 class Consumer extends BaseObject
@@ -23,7 +23,7 @@ class Consumer extends BaseObject
     {
         $array = [];
         if (empty($this->program) || empty($this->queueName) || empty($this->script)) {
-            AmqpIni::addLog(sprintf(
+            AmqpIniHelper::addLog(sprintf(
                 "program:%s, queueName:%s script:%s",
                 $this->program,
                 $this->queueName,

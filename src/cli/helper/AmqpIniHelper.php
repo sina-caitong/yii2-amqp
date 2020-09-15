@@ -15,7 +15,7 @@ defined('DEFAULT_PROCESS_PATH') or define('DEFAULT_PROCESS_PATH', dirname(__DIR_
 defined('DEFAULT_ACCESS_LOG') or define('DEFAULT_ACCESS_LOG', dirname(__DIR__) . '/log/access.log');
 defined('DEFAULT_ERROR_LOG') or define('DEFAULT_ERROR_LOG', dirname(__DIR__) . '/log/error.log');
 
-class AmqpIni
+class AmqpIniHelper
 {
     /** @var amqp.ini读取的内容 */
     protected static $array = array();
@@ -25,7 +25,7 @@ class AmqpIni
     protected static $queueArray = array();
     /** @var array 进程通信方式映射 */
     public static $communClassMap = [
-        'pipe' => \pzr\amqp\cli\Communication\PipeCommun::class,
+        'pipe' => \pzr\amqp\cli\communication\PipeCommun::class,
     ];
     /** @var array 进程文件管理方式映射 */
     public static $handlerClassMap = [
@@ -107,7 +107,7 @@ class AmqpIni
     public static function readIni()
     {
         if (!empty(static::$array)) return static::$array;
-        is_file(DEFALUT_AMQPINI_PATH) or static::exit(DEFALUT_AMQPINI_PATH . ' : amqpini no such file');
+        is_file(DEFALUT_AMQPINI_PATH) or static::exit(DEFALUT_AMQPINI_PATH . ' : AmqpIniHelper no such file');
         static::$array = parse_ini_file(DEFALUT_AMQPINI_PATH, true);
         return static::$array;
     }
@@ -276,7 +276,7 @@ class AmqpIni
     public static function getUnix()
     {
         $common = static::readCommon();
-        return $common['unix'] ?: '/usr/local/var/run/amqp_consumer_serve.sock';
+        return $common['listen'] ?: '/var/run/amqp_consumer_serve.sock';
     }
 
     public static function getPipe()

@@ -2,7 +2,7 @@
 
 namespace app\models;
 
-use pzr\amqp\cli\helper\AmqpIni;
+use pzr\amqp\cli\helper\AmqpIniHelper;
 use Yii;
 use yii\base\Model;
 
@@ -61,11 +61,11 @@ class LoginForm extends Model
     {
         if ($this->validate()) {
             $_SESSION['username'] = $this->username;
-            AmqpIni::addLog(sprintf("IP:%s, username:%s, login succ", $_SERVER['REMOTE_ADDR'], $this->username));
+            AmqpIniHelper::addLog(sprintf("IP:%s, username:%s, login succ", $_SERVER['REMOTE_ADDR'], $this->username));
             return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
         }
 
-        AmqpIni::addLog(sprintf("IP:%s, username:%s, login failed:%d", $_SERVER['REMOTE_ADDR'], $this->username, 1));
+        AmqpIniHelper::addLog(sprintf("IP:%s, username:%s, login failed:%d", $_SERVER['REMOTE_ADDR'], $this->username, 1));
         return false;
     }
 

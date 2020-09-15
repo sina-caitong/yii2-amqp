@@ -37,7 +37,7 @@ class ProcessHelper
     /** @return array */
     public static function read()
     {
-        $array = parse_ini_file(AmqpIni::getProcessFile());
+        $array = parse_ini_file(AmqpIniHelper::getProcessFile());
         $databack = [];
         foreach ($array as $k => $v) {
             list($pid, $ppid) = explode('_', $k);
@@ -73,9 +73,9 @@ class ProcessHelper
     public static function write(string $string, $append = false)
     {
         $mode = $append ? FileHelper::FILE_APPEND : FileHelper::FILE_NORMAL;
-        // return file_put_contents(AmqpIni::getProcessFile(), $string, $flag);
+        // return file_put_contents(AmqpIniHelper::getProcessFile(), $string, $flag);
         return FileHelper::write(
-            AmqpIni::getProcessFile(),
+            AmqpIniHelper::getProcessFile(),
             $string,
             $mode
         );
@@ -101,7 +101,7 @@ class ProcessHelper
         foreach ($array as $v) {
             list($pid, $ppid, $queueName, $program) = $v;
             if ($pid == $deadPid) {
-                AmqpIni::addLog(sprintf("[handle %s] %d", HandlerInterface::EVENT_DELETE_PID, $pid));
+                AmqpIniHelper::addLog(sprintf("[handle %s] %d", HandlerInterface::EVENT_DELETE_PID, $pid));
                 continue;
             }
             $ini .= sprintf("%d_%d = %s,%s%s", $pid, $ppid, $queueName, $program, PHP_EOL);
@@ -115,7 +115,7 @@ class ProcessHelper
         $array = ProcessHelper::read();
         foreach ($array as $v) {
             list($pid, $ppid, $queueName, $program) = $v;
-            AmqpIni::addLog(sprintf("[handle %s] %d", HandlerInterface::EVENT_DELETE_PPID, $ppid));
+            AmqpIniHelper::addLog(sprintf("[handle %s] %d", HandlerInterface::EVENT_DELETE_PPID, $ppid));
             posix_kill($pid, SignoHelper::KILL_CHILD_STOP);
         }
         return self::flush();
@@ -127,7 +127,7 @@ class ProcessHelper
         foreach ($array as $v) {
             list($pid, $ppid, $queueName, $program) = $v ;
             $res = posix_kill($pid, SignoHelper::KILL_CHILD_STOP);
-            AmqpIni::addLog(sprintf("[flush] kill -%d %d ,result is %s", SignoHelper::KILL_CHILD_STOP, $pid, $res));
+            AmqpIniHelper::addLog(sprintf("[flush] kill -%d %d ,result is %s", SignoHelper::KILL_CHILD_STOP, $pid, $res));
         }
 
         return self::flush();

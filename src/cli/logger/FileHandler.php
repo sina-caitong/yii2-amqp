@@ -6,7 +6,7 @@ use Monolog\DateTimeImmutable;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Logger;
-use pzr\amqp\cli\helper\AmqpIni;
+use pzr\amqp\cli\helper\AmqpIniHelper;
 
 class FileHandler implements HandlerInterface
 {
@@ -37,12 +37,12 @@ class FileHandler implements HandlerInterface
 
         if (preg_match('/%Y|%y|%d|%m/', $this->access_log)) {
             $this->real_access_log = str_replace(['%Y', '%y', '%m', '%d'], [date('Y'), date('y'), date('m'), date('d')], $this->access_log);
-            $this->real_access_log = AmqpIni::findRealpath($this->real_access_log);
+            $this->real_access_log = AmqpIniHelper::findRealpath($this->real_access_log);
         }
 
         if (preg_match('/%Y|%y|%d|%m/', $this->error_log)) {
             $this->real_error_log = str_replace(['%Y', '%y', '%m', '%d'], [date('Y'), date('y'), date('m'), date('d')], $this->error_log);
-            $this->real_error_log = AmqpIni::findRealpath($this->real_error_log);
+            $this->real_error_log = AmqpIniHelper::findRealpath($this->real_error_log);
         }
 
         $access_log = $this->real_access_log ?: $this->access_log;

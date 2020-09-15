@@ -1,8 +1,8 @@
 <?php
 
-namespace pzr\amqp\cli\Communication;
+namespace pzr\amqp\cli\communication;
 
-use pzr\amqp\cli\helper\AmqpIni;
+use pzr\amqp\cli\helper\AmqpIniHelper;
 
 class CommunFactory
 {
@@ -11,7 +11,7 @@ class CommunFactory
 
     public static function getInstance() {
         if (static::$instance) return static::$instance;
-        $config = AmqpIni::readCommun();
+        $config = AmqpIniHelper::readCommun();
         $class = $config['class'];
         unset($config['class']);
         $instance = new $class($config);

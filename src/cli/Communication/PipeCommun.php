@@ -1,8 +1,9 @@
 <?php
 
-namespace pzr\amqp\cli\Communication;
+namespace pzr\amqp\cli\communication;
 
 use Monolog\Logger as BaseLogger;
+use pzr\amqp\cli\helper\AmqpIniHelper;
 use pzr\amqp\cli\helper\FileHelper;
 
 class PipeCommun extends BaseCommun
@@ -73,6 +74,7 @@ class PipeCommun extends BaseCommun
 
     public function flush()
     {
-        return @unlink($this->pipe_file);
+        @unlink($this->pipe_file) or 
+            AmqpIniHelper::addLog('flush file error', BaseLogger::ERROR);
     }
 }

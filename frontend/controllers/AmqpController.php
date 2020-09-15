@@ -9,7 +9,7 @@ use pzr\amqp\Amqp;
 use pzr\amqp\api\AmqpApi;
 use yii\web\Controller;
 use pzr\amqp\cli\Client;
-use pzr\amqp\cli\helper\AmqpIni;
+use pzr\amqp\cli\helper\AmqpIniHelper;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -85,7 +85,6 @@ class AmqpController extends Controller
     public function actionStat()
     {
         $this->auth();
-
         $model = new AmqpForm();
         return $this->render('/amqp/stat', [
             'model' => $model
@@ -95,8 +94,8 @@ class AmqpController extends Controller
     public function actionDelbyqueue($queue)
     {
         if (empty($queue)) exit(1);
-        $logger = AmqpIni::getLogger();
-        $config = AmqpIni::readAmqp();
+        $logger = AmqpIniHelper::getLogger();
+        $config = AmqpIniHelper::readAmqp();
         $api = new AmqpApi($config);
         $info = $api->getInfosByQueue($queue);
         $isDeclare = isset($info['consumer_details']) ? true : false;
@@ -116,12 +115,12 @@ class AmqpController extends Controller
     public function actionDelbyconn($conn, $queue)
     {
         if (empty($conn) || empty($queue)) exit(1);
-        $logger = AmqpIni::getLogger();
+        $logger = AmqpIniHelper::getLogger();
         $logger->addLog(
             sprintf("DELETE [%s] CONNECTION: %s", $queue, $conn),
             Logger::WARNING
         );
-        $config = AmqpIni::readAmqp();
+        $config = AmqpIniHelper::readAmqp();
         $api = new AmqpApi($config);
         $conn = urldecode($conn);
         $api->closeConnection($conn);
@@ -173,10 +172,11 @@ class AmqpController extends Controller
 
     protected function auth() {
         if (!isset($_SESSION['username'])) {
-            unset($_SESSION['username']);
-            $this->redirect('index.php?r=amqp/login');
+            $this->redirect('index.php?r=amqp/logout');
+            return false;
+        } else {
+            return true;
         }
-        return true;
     }
 
     public function actionIni() {

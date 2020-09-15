@@ -1,8 +1,8 @@
 <?php
-namespace pzr\amqp\cli\Communication;
+namespace pzr\amqp\cli\communication;
 
 use pzr\amqp\AmqpJob;
-use pzr\amqp\cli\helper\AmqpIni;
+use pzr\amqp\cli\helper\AmqpIniHelper;
 use pzr\amqp\cli\helper\ProcessHelper;
 use pzr\amqp\cli\logger\Logger;
 
@@ -16,7 +16,7 @@ class CommunJob extends AmqpJob
     protected $logger;
 
     public function init() {
-        list($access_log, $error_log, $level) = AmqpIni::getDefaultLogger();
+        list($access_log, $error_log, $level) = AmqpIniHelper::getDefaultLogger();
         $this->logger = new Logger($access_log, $error_log, $level);
     }
 

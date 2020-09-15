@@ -2,6 +2,7 @@
 
 namespace pzr\amqp\cli\handler;
 
+use Monolog\Logger;
 use pzr\amqp\Amqp;
 use pzr\amqp\cli\helper\ProcessHelper;
 use pzr\amqp\event\PushEvent;
@@ -55,7 +56,7 @@ class AmqpHandler extends BaseHandler
             'ppid' => $ppid,
         ]);
         $this->amqp->push($job);
-        $this->logger->addLog(sprintf("[%s] %d_%d,  pidinfo:%s", $event, $pid, $ppid, json_encode($pidInfo)));
+        $this->logger->addLog(sprintf("[%s] %d_%d,  pidinfo:%s", $event, $pid, $ppid, json_encode($pidInfo)), Logger::NOTICE);
         return $pidInfo;
     }
 }

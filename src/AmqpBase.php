@@ -334,7 +334,7 @@ class AmqpBase extends Component
         $this->channel->basic_qos(null, $qos, null);
         $this->channel->basic_consume($queueName, $consumerTag, false, $noAck, false, false, $callback);
 
-        register_shutdown_function(function($channel, $connection) {
+        register_shutdown_function(function ($channel, $connection) {
             $channel->close();
             $connection->close();
         }, $this->channel, $this->connection);
@@ -401,6 +401,23 @@ class AmqpBase extends Component
             return;
         }
         $this->connection = new AMQPStreamConnection($this->host, $this->port, $this->user, $this->password, $this->vhost);
+        // $this->connection = new AMQPStreamConnection(
+        //     $this->host,
+        //     $this->port,
+        //     $this->user,
+        //     $this->password,
+        //     $this->vhost,
+        //     $insist = false,
+        //     $login_method = 'AMQPLAIN',
+        //     $login_response = null,
+        //     $locale = 'en_US',
+        //     $connection_timeout = 3.0,
+        //     $read_write_timeout = 3.0,
+        //     $context = null,
+        //     $keepalive = true,
+        //     $heartbeat = 3.0,
+        //     $channel_rpc_timeout = 3.0
+        // );
         $this->channel = $this->connection->channel();
     }
 
@@ -472,26 +489,6 @@ class AmqpBase extends Component
     public function getApi()
     {
         return $this->api;
-    }
-
-    public function releaseConsumer($queueName)
-    {
-        $this->open();
-        $this->initApi();
-        $info = $this->api->getInfosByQueue($queueName);
-        $consumers = $info['consumer_details'];
-        foreach ($consumers as $c) {
-            $tag = $c->consumer_tag;
-            $this->channel->basic_cancel($tag, true, true);
-        }
-        $this->close();
-    }
-
-    public function releaseConsumerByTag($tag)
-    {
-        $this->open();
-        $this->channel->basic_cancel($tag, true, true);
-        $this->close();
     }
 
     protected function initApi(AmqpApi $api = null)

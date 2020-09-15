@@ -3,8 +3,9 @@
 namespace pzr\amqp\cli\handler;
 
 use Exception;
+use Monolog\Logger;
 use Pheanstalk\Pheanstalk;
-use pzr\amqp\cli\helper\AmqpIni;
+use pzr\amqp\cli\helper\AmqpIniHelper;
 use pzr\amqp\cli\helper\ProcessHelper;
 
 class BeanstalkHandler extends BaseHandler
@@ -14,14 +15,14 @@ class BeanstalkHandler extends BaseHandler
     public function __construct(array $config)
     {
         parent::__construct($config);
-        isset($config['host']) or AmqpIni::exit('invalid value : [beanstalk][host]');
-        isset($config['port']) or AmqpIni::exit('invalid value : [beanstalk][port]');
+        isset($config['host']) or AmqpIniHelper::exit('invalid value : [beanstalk][host]');
+        isset($config['port']) or AmqpIniHelper::exit('invalid value : [beanstalk][port]');
         $this->talker = Pheanstalk::create(
             $config['host'],
             $config['port']
         );
         if (empty($this->talker)) {
-            AmqpIni::exit('create beanstalk failed');
+            AmqpIniHelper::exit('create beanstalk failed');
         }
     }
 
@@ -51,7 +52,7 @@ class BeanstalkHandler extends BaseHandler
             $this->talker->useTube(self::QUEUE)->put(json_encode($job));
         } catch (Exception $e) {
         }
-        $this->logger->addLog(sprintf("[%s] %d_%d,  pidinfo:%s", $event, $pid, $ppid, json_encode($pidInfo)));
+        $this->logger->addLog(sprintf("[%s] %d_%d,  pidinfo:%s", $event, $pid, $ppid, json_encode($pidInfo)), Logger::NOTICE);
         return $pidInfo;
     }
 

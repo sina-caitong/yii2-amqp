@@ -33,6 +33,7 @@ $config = [
         ],
         'db' => $db,
         'consumer' => $amqp['consumer'],
+        'easyQueue' => $amqp['easyQueue'],
     ],
     'params' => $params,
     /*

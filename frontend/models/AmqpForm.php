@@ -7,7 +7,7 @@ use Pheanstalk\Pheanstalk;
 use pzr\amqp\Amqp;
 use pzr\amqp\api\AmqpApi;
 use pzr\amqp\cli\Consumer;
-use pzr\amqp\cli\helper\AmqpIni;
+use pzr\amqp\cli\helper\AmqpIniHelper;
 use pzr\amqp\cli\helper\FileHelper;
 use pzr\amqp\cli\helper\ProcessHelper;
 use yii\base\Model;
@@ -41,11 +41,11 @@ class AmqpForm extends Model
 
     public function traceLog($limit = 100)
     {
-        list($access_log, $error_log, $level) = AmqpIni::getDefaultLogger();
+        list($access_log, $error_log, $level) = AmqpIniHelper::getDefaultLogger();
         $access_log = $this->findRealPath($access_log);
         $error_log = $this->findRealPath($error_log);
 
-        $array = AmqpIni::readIni();
+        $array = AmqpIniHelper::readIni();
         $amqp = $array['amqp'];
         $redis = $array['redis'];
         $beanstalk = $array['beanstalk'];
@@ -84,15 +84,15 @@ class AmqpForm extends Model
     {
         if (preg_match('/%Y|%y|%d|%m/', $path)) {
             $path = str_replace(['%Y', '%y', '%m', '%d'], [date('Y'), date('y'), date('m'), date('d')], $path);
-            $path = AmqpIni::findRealpath($path);
+            $path = AmqpIniHelper::findRealpath($path);
         }
         return $path;
     }
 
     public function statV2()
     {
-        $files = AmqpIni::getConsumerFile();
-        $config = AmqpIni::readAmqp();
+        $files = AmqpIniHelper::getConsumerFile();
+        $config = AmqpIniHelper::readAmqp();
         $api = new AmqpApi($config);
         $statFile = $this->statFile();
 
@@ -167,7 +167,7 @@ class AmqpForm extends Model
         $domainCheck = array();
         foreach ($array as $v) {
             list($pid, $ppid, $queueName, $program) = $v;
-            $isAlive = $domainCheck[$ppid] = isset($domainCheck[$ppid]) ? $domainCheck[$ppid] : AmqpIni::checkProcessAlive($ppid);
+            $isAlive = $domainCheck[$ppid] = isset($domainCheck[$ppid]) ? $domainCheck[$ppid] : AmqpIniHelper::checkProcessAlive($ppid);
             $ppid = $isAlive ? $ppid : 1;
             $str = substr($queueName, -2);
             $queue = preg_match('/^_\d$/', $str) ? substr($queueName, 0, -2) : $queueName;
@@ -210,24 +210,24 @@ class AmqpForm extends Model
 
     public function getAmqpIni()
     {
-        $array = AmqpIni::readIni();
-        $access_log = AmqpIni::findRealpath($array['common']['access_log']);
+        $array = AmqpIniHelper::readIni();
+        $access_log = AmqpIniHelper::findRealpath($array['common']['access_log']);
         $is_access_log_writable = is_writeable($access_log);
         $is_access_log_readable = is_readable($access_log);
 
-        $error_log = AmqpIni::findRealpath($array['common']['error_log']);
+        $error_log = AmqpIniHelper::findRealpath($array['common']['error_log']);
         $is_error_log_writable = is_writeable($error_log);
         $is_error_log_readable = is_readable($error_log);
 
-        $pipe_file = AmqpIni::findRealpath($array['pipe']['pipe_file']);
+        $pipe_file = AmqpIniHelper::findRealpath($array['pipe']['pipe_file']);
         $is_pipe_writable = is_writable($pipe_file);
         $is_pipe_readable = is_readable($pipe_file);
 
-        $pidfile = AmqpIni::findRealpath($array['common']['pidfile']);
+        $pidfile = AmqpIniHelper::findRealpath($array['common']['pidfile']);
         $is_pidfile_writable = is_writable($pidfile);
         $is_pidfile_readable = is_readable($pidfile);
 
-        $process_file = AmqpIni::findRealpath($array['common']['process_file']);
+        $process_file = AmqpIniHelper::findRealpath($array['common']['process_file']);
         $is_process_file_writable = is_writable($process_file);
         $is_process_file_readable = is_readable($process_file);
 
@@ -239,7 +239,7 @@ class AmqpForm extends Model
         $is_default_error_log_writable = is_writable(DEFAULT_ERROR_LOG);
         $is_default_error_log_readable = is_readable(DEFAULT_ERROR_LOG);
 
-        $unix = AmqpIni::findRealpath($array['common']['unix']);
+        $unix = AmqpIniHelper::findRealpath($array['common']['listen']);
         $socket = socket_create(AF_UNIX, SOCK_STREAM, 0);
         $isConn = 0;
         $error = '';

@@ -2,7 +2,7 @@
 
 namespace pzr\amqp\cli\handler;
 
-use pzr\amqp\cli\helper\AmqpIni;
+use pzr\amqp\cli\helper\AmqpIniHelper;
 use pzr\amqp\exception\InvalidArgumentException;
 
 class HandlerFactory
@@ -12,7 +12,7 @@ class HandlerFactory
     /** @return BaseHandler */
     public static function getHandler()
     {
-        $handler = AmqpIni::readHandler();
+        $handler = AmqpIniHelper::readHandler();
         $class = $handler['class'];
         if (isset(self::$handlerObjects[$class]) && $object = self::$handlerObjects[$class]) return $object;
         unset($handler['class']);

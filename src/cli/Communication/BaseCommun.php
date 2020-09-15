@@ -1,8 +1,8 @@
 <?php
 
-namespace pzr\amqp\cli\Communication;
+namespace pzr\amqp\cli\communication;
 
-use pzr\amqp\cli\Communication\CommunInterface;
+use pzr\amqp\cli\communication\CommunInterface;
 use pzr\amqp\cli\logger\Logger;
 
 abstract class BaseCommun implements CommunInterface

@@ -1,6 +1,6 @@
 <?php
 
-namespace pzr\amqp\cli\Communication;
+namespace pzr\amqp\cli\communication;
 
 use pzr\amqp\Amqp;
 use pzr\amqp\event\PushEvent;

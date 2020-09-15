@@ -2,7 +2,8 @@
 
 namespace pzr\amqp\cli\handler;
 
-use pzr\amqp\cli\helper\AmqpIni;
+use Monolog\Logger;
+use pzr\amqp\cli\helper\AmqpIniHelper;
 use pzr\amqp\cli\helper\ProcessHelper;
 
 class RedisHandler extends BaseHandler
@@ -17,7 +18,7 @@ class RedisHandler extends BaseHandler
         $this->redis->auth($config['password']);
 
         if (empty($this->redis)) {
-            AmqpIni::exit('create redis failed');
+            AmqpIniHelper::exit('create redis failed');
         }
     }
 
@@ -50,7 +51,7 @@ class RedisHandler extends BaseHandler
         $deadPid = empty($pid) ? $ppid : $pid;
         $job = [$event => $deadPid];
         $this->redis->lPush(self::QUEUE, json_encode($job));
-        $this->logger->addLog(sprintf("[%s] %d_%d,  pidinfo:%s", $event, $pid, $ppid, json_encode($pidInfo)));
+        $this->logger->addLog(sprintf("[%s] %d_%d,  pidinfo:%s", $event, $pid, $ppid, json_encode($pidInfo)), Logger::NOTICE);
         return $pidInfo;
     }
 
