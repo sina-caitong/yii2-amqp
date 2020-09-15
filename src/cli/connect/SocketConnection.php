@@ -3,7 +3,7 @@
 
 namespace pzr\amqp\cli\connect;
 
-use pzr\amqp\cli\Command;
+use pzr\amqp\cli\command\Command;
 use pzr\amqp\cli\helper\AmqpIniHelper;
 
 class SocketConnection implements ConnectionInterface
@@ -26,7 +26,7 @@ class SocketConnection implements ConnectionInterface
         socket_bind($this->socket, $host)
             or AmqpIniHelper::exit('socket bind error');
         socket_listen($this->socket);
-        AmqpIniHelper::addLog('amqp server started');
+        // AmqpIniHelper::addLog('amqp server started');
 
         $this->command = new Command();
     }

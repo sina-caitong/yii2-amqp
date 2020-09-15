@@ -13,8 +13,8 @@ require $baseDir . '/vendor/yiisoft/yii2/Yii.php';
 $unixPath = AmqpIniHelper::getUnix();
 @unlink($unixPath);
 
-// $socket = new SocketConnection($unixPath);
-$socket = new SwooleConnection($unixPath);
+$socket = new SocketConnection($unixPath);
+// $socket = new SwooleConnection($unixPath);
 
 chmod($unixPath, 0777);
 $socket->start();

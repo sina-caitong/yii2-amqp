@@ -6,6 +6,7 @@ use Exception;
 use Monolog\Logger as BaseLogger;
 use pzr\amqp\Amqp;
 use pzr\amqp\cli\communication\CommunFactory;
+use pzr\amqp\cli\Consumer;
 use pzr\amqp\cli\handler\HandlerFactory;
 use pzr\amqp\cli\helper\AmqpIniHelper;
 use pzr\amqp\cli\helper\ProcessHelper;
@@ -98,9 +99,7 @@ class Dispatcher
                 if (empty($pidinfo) || $signo == SignoHelper::KILL_CHILD_STOP || !empty($exitStatus)) continue;
                 list($queueName, $program) = $pidinfo;
                 $c = $this->getConsumer($queueName, $program);
-                if (empty($c)) {
-                    continue;
-                }
+                if (empty($c)) continue;
                 $this->fork($c);
             }
         }

@@ -15,6 +15,9 @@ class SwooleConnection implements ConnectionInterface
 
     public function __construct($host)
     {
+        if (!extension_loaded('swoole')) {
+            throw new \Exception('swoole extension not found');
+        }
         $this->server = new \Swoole\Server($host, $port = 0, $mode = SWOOLE_PROCESS, $sock_type = SWOOLE_UNIX_STREAM);
         $this->command = new SwooleCommand();
     }

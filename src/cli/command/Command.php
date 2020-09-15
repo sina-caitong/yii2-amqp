@@ -62,10 +62,11 @@ class Command extends BaseCommand implements CommandInterface
         } elseif ($pid > 0) {
             $this->childs[] = $pid;
         } else {
-            $path = __DIR__ . '/run/ExecDispatcher.php';
-            pcntl_exec(AmqpIniHelper::getCommand(), [$path])
-                or $this->logger->addLog('shell exec error' ,BaseLogger::ERROR);
+            // $path = __DIR__ . '/run/ExecDispatcher.php';
+            // pcntl_exec(AmqpIniHelper::getCommand(), [$path])
+            //     or $this->logger->addLog('shell exec error' ,BaseLogger::ERROR);
             // shell_exec($cmd); //生成的子进程ID无法捕捉
+            (new Dispatcher())->run();
             exit(0);
         }
         while (!$this->end) {

@@ -219,10 +219,11 @@ class AmqpIniHelper
         if (empty($filepath)) {
             return false;
         }
+        if (is_file($filepath)) return realpath($filepath);
         if (strncmp($filepath, '.', 1)) {
             $dir = str_replace(strrchr($filepath, '/'), '', $filepath);
             if (!is_dir($dir)) mkdir($dir, 0777, true);
-            if ($touch && !is_file($filepath) && !touch($filepath) && !chmod($filepath, 0755)) {
+            if ($touch && !is_file($filepath) && !@touch($filepath) && !@chmod($filepath, 0755)) {
                 static::addLog($filepath . ' touch failed', BaseLogger::ERROR);
                 return false;
             }
