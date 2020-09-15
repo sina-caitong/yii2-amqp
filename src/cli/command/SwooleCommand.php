@@ -57,53 +57,11 @@ class SwooleCommand extends BaseCommand implements CommandInterface
 
     public function startAll()
     {
-        // 报错：无法再协程中使用 Fatal error: Uncaught Swoole\Error: must be forked outside the coroutine
-        // swoole_async_set([
-        //     'enable_coroutine' => false
-        // ]);
-
-        // \Swoole\Coroutine::set(['enable_coroutine' => false]);
-
-        // ini_set('swoole.enable_coroutine','Off');
-        // $process = new \Swoole\Process(function() {
-        //     // (new SwooleDispatcher())->run();
-        // });
-        // $process->start();
-        // \Swoole\Process::wait(false);
-
-        // 报错：无法使用Server多进程
         // $pm = new \Swoole\Process\ProcessManager();
         // $pm->add(function ($pool, $workerId) {
         //     (new SwooleDispatcher())->run();
         // });
         // $pm->start();
-
-        $this->end = false;
-        pcntl_signal(SIGCHLD, function ($signo, $siginfo) {
-            foreach ($this->childs as $k => $pid) {
-                $result = pcntl_waitpid($pid, $status, WNOHANG);
-                if ($result == $pid || $result == -1) {
-                    unset($this->childs[$k]);
-                }
-            }
-            if (empty($this->childs)) $this->end = true;
-        });
-        $pid = pcntl_fork();
-        if ($pid < 0) {
-            exit(0);
-        } elseif ($pid > 0) {
-            $this->childs[] = $pid;
-        } else {
-            // $path = __DIR__ . '/run/ExecDispatcher.php';
-            // pcntl_exec(AmqpIniHelper::getCommand(), [$path])
-            //     or $this->logger->addLog('shell exec error' ,Logger::ERROR);
-            // shell_exec($cmd); //生成的子进程ID无法捕捉
-            (new SwooleDispatcher())->run();
-            exit(0);
-        }
-        while (!$this->end) {
-            pcntl_signal_dispatch();
-        }
     }
     public function stopAll()
     {
