@@ -45,46 +45,33 @@ class AmqpForm extends Model
         $access_log = $this->findRealPath($access_log);
         $error_log = $this->findRealPath($error_log);
 
-        $array = AmqpIniHelper::readIni();
-        $amqp = $array['amqp'];
-        $redis = $array['redis'];
-        $beanstalk = $array['beanstalk'];
-        $pipe = $array['pipe'];
+        $default_access_log = DEFAULT_ACCESS_LOG;
+        $default_error_log = DEFAULT_ERROR_LOG;
 
-        $amqp_access_log = isset($amqp['access_log']) && $amqp['access_log'] != $access_log ?
-            $this->findRealPath($amqp['access_log']) : '';
-        $amqp_error_log = isset($amqp['error_log']) && $amqp['error_log'] != $error_log ?
-            $this->findRealPath($amqp['error_log']) : '';
+        $handler = AmqpIniHelper::readHandler();
+        $commun = AmqpIniHelper::readCommun();
 
-        $redis_access_log = isset($redis['access_log']) && $redis['access_log'] != $access_log ?
-            $this->findRealPath($redis['access_log']) : '';
-        $redis_error_log = isset($redis['error_log']) && $redis['error_log'] != $error_log ?
-            $this->findRealPath($redis['error_log']) : '';
 
-        $beanstalk_access_log = isset($beanstalk['access_log']) && $beanstalk['access_log'] != $access_log ?
-            $this->findRealPath($beanstalk['access_log']) : '';
-        $beanstalk_error_log = isset($beanstalk['error_log']) && $beanstalk['error_log'] != $error_log ?
-            $this->findRealPath($beanstalk['error_log']) : '';
+        $handler_access_log = isset($handler['access_log']) ? $this->findRealPath($handler['access_log']) : '';
+        $handler_error_log = isset($handler['error_log']) ? $this->findRealPath($handler['error_log']) : '';
 
-        $pipe_access_log = isset($pipe['access_log']) && $pipe['access_log'] != $access_log ?
-            $this->findRealPath($pipe['access_log']) : '';
-        $pipe_error_log = isset($pipe['error_log']) && $pipe['error_log'] != $error_log ?
-            $this->findRealPath($pipe['error_log']) : '';
+        $commun_access_log = isset($commun['access_log']) ? $this->findRealPath($commun['access_log']) : '';
+        $commun_error_log = isset($commun['error_log']) ? $this->findRealPath($commun['error_log']) : '';
+
+        $log = [
+            $default_access_log,
+            $default_error_log,
+            $access_log,
+            $error_log,
+            $handler_access_log,
+            $handler_error_log,
+            $commun_access_log,
+            $commun_error_log,
+        ];
 
         return [
             'level' => $level,
-            'logs' => [
-                $access_log,
-                $error_log,
-                $amqp_access_log,
-                $amqp_error_log,
-                $redis_access_log,
-                $redis_error_log,
-                $beanstalk_access_log,
-                $beanstalk_error_log,
-                $pipe_access_log,
-                $pipe_error_log
-            ]
+            'logs' => array_unique($log)
         ];
     }
 
