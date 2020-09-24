@@ -29,6 +29,8 @@ class SwooleDispatcher
     /** @var Logger */
     protected $logger;
 
+    protected $atomic;
+
     protected $uniq_consumers;
 
     public function __construct()
@@ -37,6 +39,7 @@ class SwooleDispatcher
         $this->handler = HandlerFactory::getHandler();
         $this->commun = CommunFactory::getInstance();
         $this->logger = AmqpIniHelper::getLogger();
+        $this->atomic = new \Swoole\Atomic();
     }
 
     public function run()
@@ -64,17 +67,28 @@ class SwooleDispatcher
         unset($this->consumers);
         // 清空管道里的数据
         $this->commun->flush();
+
         // master进程继续
         while (true) {
-            foreach($this->childPids as $pid) {
+            // $i = $this->atomic->get();
+            // while ($i--) {
+            //     $status = \Swoole\Process::wait(false);
+            //     if ($status) {
+            //         $this->atomic->sub(1);
+            //         $this->reload($status);
+            //     }
+            // }
+
+            foreach($this->childPids as $k=>$pid) {
                 $status = \Swoole\Process::wait(false);
-                if ($status == false)
-                $this->reload($status);
+                if ($status) {
+                    unset($this->childPids[$k]);
+                    $this->reload($status);
+                }
             }
-            
-            $this->receiveNotify();
             if (empty($this->childPids)) break;
-            sleep(1);
+            $this->receiveNotify();
+            sleep(1); 
         }
     }
 
@@ -85,23 +99,21 @@ class SwooleDispatcher
      */
     protected function reload($status)
     {
-            $signal = $status['signal'];
-            $pid = $status['pid'];
-            $code = $status['code'];
-            $pidinfo = $this->handler->delPid($pid, getmypid());
-            $key = array_search($pid, $this->childPids);
-            unset($this->childPids[$key]);
-            if (empty($pidinfo)) return false;
-            switch($signal) {
-                case SignoHelper::KILL_CHILD_STOP:
-                    break;
-                case SignoHelper::KILL_CHILD_RELOAD:
-                    list($queueName, $program) = $pidinfo;
-                    $c = $this->getConsumer($queueName, $program);
-                    if (empty($c)) break;
-                    $this->fork($c);
-                    break;
-            }
+        $signal = $status['signal'];
+        $pid = $status['pid'];
+        $code = $status['code'];
+        $pidinfo = $this->handler->delPid($pid, getmypid());
+        if (empty($pidinfo)) return false;
+        switch ($signal) {
+            case SignoHelper::KILL_CHILD_STOP:
+                break;
+            case SignoHelper::KILL_CHILD_RELOAD:
+                list($queueName, $program) = $pidinfo;
+                $c = $this->getConsumer($queueName, $program);
+                if (empty($c)) break;
+                $this->fork($c);
+                break;
+        }
     }
 
     /**
@@ -151,7 +163,7 @@ class SwooleDispatcher
     private function _notifyMaster()
     {
         $ppid = AmqpIniHelper::readPpid();
-        $isAlive = AmqpIniHelper::checkProcessAlive($ppid);
+        $isAlive = \Swoole\Process::kill($ppid, 0);
         if (!$isAlive) return false;
         $this->logger->addLog('ppid:' . $ppid . ' is alive', BaseLogger::NOTICE);
         $queues = array();
@@ -175,11 +187,12 @@ class SwooleDispatcher
      */
     protected function fork(Consumer $c)
     {
+        // swoole 只能在cli模式下使用
         $process = new \Swoole\Process(function () use ($c) {
             $this->worker($c);
-            $this->childPids[] = getmypid();
         });
-        $process->name('AMQP Worker');
+        // $this->atomic->add(1);
+        $this->childPids[] = $process->pid;
         $process->start();
     }
 

@@ -18,7 +18,7 @@ class FileHelper
     {
         $fd = fopen($file, $mode);
         if (!is_resource($fd)) {
-            $flag = @chmod($file, 0755);
+            $flag = @chmod($file, 0777);
             if ($flag === false) {
                 AmqpIniHelper::exit($file . ' chmod 0755 failed', Logger::ERROR);
             }
@@ -33,9 +33,9 @@ class FileHelper
 
     public static function read($file, $mode = self::FILE_READ)
     {
-        if (empty(@filesize($file))) return '';
+        if (!file_exists($file)) return '';
         $fd = fopen($file, $mode);
-        $data = fread($fd, filesize($file));
+        $data = fread($fd, 1024);
         fclose($fd);
         return $data;
     }

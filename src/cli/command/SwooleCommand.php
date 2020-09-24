@@ -16,7 +16,6 @@ class SwooleCommand extends BaseCommand implements CommandInterface
 
     public function dispatch($input)
     {
-
         $input = trim(strtolower($input));
         list($command, $pid) = explode('|', $input);
         $this->logger->addLog('dispatch command: ' . $command, Logger::DEBUG);
@@ -57,12 +56,9 @@ class SwooleCommand extends BaseCommand implements CommandInterface
 
     public function startAll()
     {
-        // $pm = new \Swoole\Process\ProcessManager();
-        // $pm->add(function ($pool, $workerId) {
-        //     (new SwooleDispatcher())->run();
-        // });
-        // $pm->start();
+        (new SwooleDispatcher())->run();
     }
+    
     public function stopAll()
     {
         $array = ProcessHelper::read();
@@ -75,16 +71,52 @@ class SwooleCommand extends BaseCommand implements CommandInterface
         $this->commun->flush();
         return true;
     }
+
     public function reloadAll()
     {
+        $array = ProcessHelper::read();
+        $domain = AmqpIniHelper::readPpid();
+        $isAlive = \Swoole\Process::kill($domain, 0);
+        foreach ($array as $v) {
+            list($pid, $ppid, $queueName, $program) = $v;
+            $signo = $isAlive && $ppid == $domain ?  SignoHelper::KILL_CHILD_RELOAD : SignoHelper::KILL_CHILD_STOP;
+            $res = \Swoole\Process::kill($pid, $signo);
+            $this->logger->addLog(sprintf("[handleReload] kill -%d %d , result is %d", $signo, $pid, $res), BaseLogger::NOTICE);
+        }
+        return true;
     }
+
     public function stopOne($pid)
     {
+        $this->logger->addLog(sprintf("[handleStop] kill -%d %d", SignoHelper::KILL_CHILD_STOP, $pid));
+        return \Swoole\Process::kill($pid, SignoHelper::KILL_CHILD_STOP);
     }
+
     public function CopyOne($pid)
     {
+        $ppid = AmqpIniHelper::readPpid();
+        if (empty($ppid)) {
+            $this->logger->addLog(
+                sprintf("pid:%d, ppid:%d", $pid, $ppid), Logger::NOTICE
+            );
+            return false;
+        }
+        list($queueName, $program) = ProcessHelper::readPid($pid, $ppid);
+        if (empty($queueName) || empty($program)) {
+            $this->logger->addLog(
+                sprintf("queueName:%s, program:%s", $queueName, $program), Logger::NOTICE
+            );
+            return false;
+        }
+
+        $this->commun->write($queueName, $program);
+        $this->commun->close();
+        return true;
     }
+
     public function reloadOne($pid)
     {
+        $this->logger->addLog(sprintf("[handleRestart] kill -%d %d", SignoHelper::KILL_CHILD_RELOAD, $pid));
+        return \Swoole\Process::kill($pid, SignoHelper::KILL_CHILD_RELOAD);
     }
 }

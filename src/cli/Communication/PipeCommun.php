@@ -30,9 +30,10 @@ class PipeCommun extends BaseCommun
     public function read()
     {
         $buffer = FileHelper::read($this->pipe_file);
+        // $buffer = file_get_contents($this->pipe_file);
         if (empty($buffer)) return '';
         $this->flush();
-        $this->logger->addLog(sprintf("[pipe] read buffer: %s", $buffer));
+        $this->logger->addLog(sprintf("[pipe] read buffer from %s: %s", $this->pipe_file, $buffer));
         $array = explode('|', $buffer);
         $data = array();
         foreach ($array as $k => $v) {
@@ -68,13 +69,13 @@ class PipeCommun extends BaseCommun
         $len = strlen($string);
         $size = FileHelper::write($this->pipe_file, $string);
         $level = $len == $size ? BaseLogger::INFO : BaseLogger::ERROR;
-        $this->logger->addLog(sprintf("[pipe] write:%s, len:%d, succ:%d", $string, $len, $size), $level);
+        $this->logger->addLog(sprintf("[pipe] write_batch:%s, len:%d, succ:%d", $string, $len, $size), $level);
         return $size;
     }
 
     public function flush()
     {
-        @unlink($this->pipe_file) or 
-            AmqpIniHelper::addLog('flush file error', BaseLogger::ERROR);
+        FileHelper::write($this->pipe_file, '') or 
+            AmqpIniHelper::addLog('flush file error:' . $this->pipe_file, BaseLogger::ERROR);
     }
 }
