@@ -1,15 +1,14 @@
 <?php
 
-namespace app\models;
+namespace pzr\amqp\jobs;
 
-use pzr\amqp\AmqpJob;
+use PayConfig;
 
 /**
- * @example DEMO
  * 被调用方实现execute的实际响应方法，并且在被调用方的工作环境下启动RPC消费者
  */
-class ServeJob extends AmqpJob
-{    
+class RpcJob extends AmqpJob
+{
     /** 
      * 1、如果追求客户端调用通用性比较好，可以定义请求的对象是什么，
      * 并且由服务端实例化该对象并且调用实际的响应方法。对于调用方来说需要提前知道该对象的命名空间及实例化
@@ -23,7 +22,12 @@ class ServeJob extends AmqpJob
 
     public function execute()
     {
-        $obj = new $this->object(); //或者实际的对象
+        if (empty($this->object) || empty($this->action)) {
+            return false;
+        }
+        $obj = $this->object;
+        $obj = new $obj();
+        if (!is_object($obj)) return false;
         if (!method_exists($obj, $this->action)) {
             return false;
         }
