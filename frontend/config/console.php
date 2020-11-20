@@ -33,7 +33,9 @@ $config = [
         ],
         'db' => $db,
         'consumer' => $amqp['consumer'],
+        'rpcConsumer' => $amqp['rpcConsumer'],
         'easyQueue' => $amqp['easyQueue'],
+        'rpcQueue' => $amqp['rpcQueue'],
     ],
     'params' => $params,
     /*

@@ -3,7 +3,7 @@
 return array(
     /** RPC消费者 */
     'rpcConsumer' => [
-        'class' =>  \pzr\amqp\RpcAmqp::class,
+        'class' =>  \pzr\amqp\AmqpRpc::class,
         'host' => '127.0.0.1',
         'port' => 5672,
         'user' => 'guest',

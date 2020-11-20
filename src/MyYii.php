@@ -68,10 +68,13 @@ class MyYii
             }
 
             $result = $rpcResponse->getResponse();
+
+            /* 单个请求 */
             if (!is_array($result)) {
                 return $this->serializer->unserialize($result);
             }
 
+            /* 批量请求 */
             $results = [];
             foreach( $result as $corrid => $r ) {
                 $results[$corrid] = $this->serializer->unserialize($r);

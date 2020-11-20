@@ -5,6 +5,7 @@ namespace pzr\amqp;
 use PhpAmqpLib\Message\AMQPMessage;
 use pzr\amqp\event\ExecEvent;
 use pzr\amqp\event\PushEvent;
+use pzr\amqp\jobs\AmqpJob;
 
 /**
  * 通过AMQP实现RPC调用

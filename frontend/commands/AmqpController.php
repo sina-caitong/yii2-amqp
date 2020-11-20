@@ -6,6 +6,7 @@ use app\models\CountJob;
 use app\models\RequestJob;
 use pzr\amqp\AmqpBase;
 use pzr\amqp\event\PushEvent;
+use pzr\amqp\jobs\RpcJob;
 use Yii;
 use yii\console\Controller;
 
@@ -129,14 +130,15 @@ class AmqpController extends Controller
         if (empty($jobs) || !is_array($jobs)) {
             return false;
         }
-        Yii::$app->serveQueue->on(AmqpBase::EVENT_BEFORE_PUSH, function(PushEvent $event) {
-            Yii::$app->serveQueue->bind();
+
+        Yii::$app->rpcQueue->on(AmqpBase::EVENT_BEFORE_PUSH, function(PushEvent $event) {
+            Yii::$app->rpcQueue->bind();
         });
 
         /**
          * 既能支持单条又能支持批量
          */
-        $response = Yii::$app->serveQueue->setQos($qos)->setTimeout($timeout)->publish($jobs);
+        $response = Yii::$app->rpcQueue->setQos($qos)->setTimeout($timeout)->publish($jobs);
         return $response;
     }
 

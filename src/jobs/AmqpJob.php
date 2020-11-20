@@ -9,6 +9,13 @@ class AmqpJob extends BaseObject implements JobInterface
 {
 
     /**
+     * 是否开启调试模式
+     *
+     * @var boolean
+     */
+    public $debug = false;
+
+    /**
      * RPC客户端请求的唯一标志
      *
      * @var string

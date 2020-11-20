@@ -2,7 +2,8 @@
 
 namespace pzr\amqp\jobs;
 
-use PayConfig;
+use pzr\amqp\Response;
+use ReflectionMethod;
 
 /**
  * 被调用方实现execute的实际响应方法，并且在被调用方的工作环境下启动RPC消费者
@@ -23,13 +24,21 @@ class RpcJob extends AmqpJob
     public function execute()
     {
         if (empty($this->object) || empty($this->action)) {
-            return false;
+            return $this->debug ? Response::setError(1) : false;
+        }
+        if (!class_exists($this->object)) {
+            return $this->debug ? Response::setError(4) : false;
+        }
+        $reflect = new ReflectionMethod($this->object, $this->action);
+        $flag = $reflect->isStatic();
+        if ($flag) {
+            return $reflect->invokeArgs(null, $this->params);
         }
         $obj = $this->object;
         $obj = new $obj();
-        if (!is_object($obj)) return false;
+        if (!is_object($obj)) return Response::setError(2);
         if (!method_exists($obj, $this->action)) {
-            return false;
+            return $this->debug ? Response::setError(3) : false;
         }
         return call_user_func_array([$obj, $this->action], $this->params);
     }
