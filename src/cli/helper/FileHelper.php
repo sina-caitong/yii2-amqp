@@ -35,7 +35,8 @@ class FileHelper
     {
         if (!file_exists($file)) return '';
         $fd = fopen($file, $mode);
-        $data = fread($fd, 1024);
+        $size = @filesize($file) ?:1024;
+        $data = fread($fd, $size);
         fclose($fd);
         return $data;
     }
