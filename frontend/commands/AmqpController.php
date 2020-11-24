@@ -46,81 +46,7 @@ class AmqpController extends Controller
     {
         Yii::$app->rpcConsumer->consume($queueName, $qos);
     }
-
-    /**
-     * 普通队列定义
-     *
-     * @return void
-     */
-    public function actionEasy() {
-        Yii::$app->easyQueue->on(AmqpBase::EVENT_BEFORE_PUSH, function(PushEvent $event) {
-            Yii::$app->easyQueue->bind();   //绑定队列，如果已经绑定可以注释此方法
-            // $event->noWait = true;          //默认false开启客户端消息确认机制，true则关闭
-        });
-
-        Yii::$app->easyQueue->on(AmqpBase::EVENT_PUSH_ACK, function(PushEvent $event) {
-            // 客户端发送消息确认成功
-            // var_dump('ack',$event->job);
-        });
-
-        Yii::$app->easyQueue->on(AmqpBase::EVENT_PUSH_NACK, function(PushEvent $event) {
-            // 客户端发送消息确认失败
-            var_dump('nack', $event->job);
-        });
-
-        // 发送单条消息
-        // Yii::$app->easyQueue->push(new CountJob([
-        //     'count' => 1,
-        // ]));
-
-        // 批量发送
-        for ($i=1; $i<=10; $i++) {
-            $jobs[] = new CountJob([
-                'count' => $i
-            ]);
-        }
-        Yii::$app->easyQueue->publish($jobs);
-    }
-
-    /**
-     * 延时队列定义
-     *
-     * @return void
-     */
-    public function actionDelay() {
-        Yii::$app->delayQueue->on(AmqpBase::EVENT_BEFORE_PUSH, function(PushEvent $event) {
-            Yii::$app->delayQueue->bind();
-        });
-
-        // 批量发送
-        for ($i=1; $i<=10; $i++) {
-            $jobs[] = new CountJob([
-                'count' => $i
-            ]);
-        }
-        Yii::$app->delayQueue->publish($jobs, '07_14_delay.test.');
-    }
-
-    /**
-     * RPC队列定义
-     *
-     * @return void
-     */
-    public function actionRpc() {
-        Yii::$app->rpcQueue->on(AmqpBase::EVENT_BEFORE_PUSH, function(PushEvent $event) {
-            Yii::$app->rpcQueue->bind();
-        });
-
-        // 批量请求
-        for ($i=1; $i<=10; $i++) {
-            $jobs[] = new RequestJob([
-                'request' => 'request_' . $i,
-            ]);
-        }
-        $response = Yii::$app->rpcQueue->setQos(10)->publish($jobs);
-        return $response;
-    }
-
+    
     /**
      * RPC 批量发送请求
      * 
@@ -140,36 +66,6 @@ class AmqpController extends Controller
          */
         $response = Yii::$app->rpcQueue->setQos($qos)->setTimeout($timeout)->publish($jobs);
         return $response;
-    }
-
-    /**
-     * 测试开启strict模式
-     * php yii amqp/test-strict
-     * @return void
-     */
-    public function actionTestStrict() {
-        Yii::$app->easyQueue->on(AmqpBase::EVENT_BEFORE_PUSH, function(PushEvent $event) {
-            Yii::$app->easyQueue->bind();   //绑定队列，如果已经绑定可以注释此方法
-            Yii::$app->easyQueue->getApi()->setPolicy();
-        });
-
-        // 批量发送
-        for ($i=1; $i<=100; $i++) {
-            $jobs[] = new CountJob([
-                'count' => $i
-            ]);
-            
-            if ($i % 10 == 0) {
-                Yii::$app->easyQueue->publish($jobs);
-                echo $i . PHP_EOL;
-                $jobs = [];
-            }
-        }
-        
-    }
-
-    public function actionProcess() {
-        Yii::$app->processQeueu->bind();
     }
 
 }

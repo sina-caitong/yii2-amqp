@@ -11,6 +11,6 @@ require $baseDir . '/vendor/yiisoft/yii2/Yii.php';
 
 $config = require dirname(__DIR__) . '/config/web.php';
 
-session_start();
+// session_start();
 
 (new yii\web\Application($config))->run();

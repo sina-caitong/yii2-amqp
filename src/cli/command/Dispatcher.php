@@ -135,9 +135,7 @@ class Dispatcher
             return $this->uniq_consumers[$key];
         }
         $config = AmqpIniHelper::getConsumersByProgram($program);
-        $config['queueName'] = $queueName;
-        $config['duplicate'] = 1;
-        $config['numprocs'] = 1;
+        if (empty($config)) return null;
         $consumer = new Consumer($config);
         $this->uniq_consumers[$key] = $consumer;
         return $consumer;
@@ -196,18 +194,45 @@ class Dispatcher
 
     protected function worker(Consumer $c)
     {
-        $this->handler->addQueue(getmypid(), posix_getppid(), $c->queueName, $c->program);
-        $args = [
-            $c->script,
-            $c->request,
-            $c->queueName,
-            $c->qos
-        ];
+        $this->handler->addQueue(getmypid(), posix_getppid(), $c->queue, $c->program);
         @cli_set_process_title('AMQP worker consmer');
-        $flag = pcntl_exec(AmqpIniHelper::getCommand(), $args);
+        $command = str_replace(['{php}', '{directory}', '{queueName}', '{qos}'], [
+            AmqpIniHelper::getCommand(),
+            $c->directory,
+            $c->queue,
+            $c->qos
+        ], $c->command);
+        preg_match_all('/(\S+)/', $command, $matches);
+        $args = $matches[0];
+        AmqpIniHelper::addLog($command);
+        $sh = array_shift($args);
+        $flag = pcntl_exec($sh, $args);
         if ($flag === false) {
             exit(1);
         }
         exit(0);
+
+        // $command = str_replace(['{php}', '{queueName}', '{qos}'] ,[
+        //     AmqpIniHelper::getCommand(),
+        //     $c->queueName,
+        //     $c->qos
+        // ], $c->command);
+        // $descriptorspec = array(
+        //     0 => array("pipe", "r"),  // 标准输入，子进程从此管道中读取数据
+        //     1 => array("pipe", "w"),  // 标准输出，子进程向此管道中写入数据
+        //     2 => array("file", $c->logfile, "a") // 标准错误，写入到一个文件
+        //  );
+        // $process = proc_open($command, $descriptorspec, $pipe, $c->directory);
+        // AmqpIniHelper::addLog(sprintf(
+        //     "cd %s && %s, result:%s",
+        //     $c->directory,
+        //     $command,
+        //     intval($process)
+        // ));
+        // // return $process;
+        // if ($process === false) {
+        //     exit(1);
+        // }
+        // exit(0);
     }
 }

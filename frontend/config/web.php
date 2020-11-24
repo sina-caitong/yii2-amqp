@@ -12,7 +12,7 @@ if (is_file(__DIR__ . '/MY_amqp.php')) {
 $baseDir = require dirname(__DIR__, 2) . '/FindVendor.php';
 
 $config = [
-    'id' => 'basic2',
+    'id' => 'basic',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'aliases' => [
@@ -55,7 +55,6 @@ $config = [
         ],
         'db' => $db,
         'consumer' => $amqp['consumer'],
-        
         /*
         'urlManager' => [
             'enablePrettyUrl' => true,

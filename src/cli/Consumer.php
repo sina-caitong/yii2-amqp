@@ -8,26 +8,35 @@ use yii\base\BaseObject;
 
 class Consumer extends BaseObject
 {
+    /** 队列名称 */
     public $queueName;
-    public $qos;
-    public $numprocs;
+    /** 消费者同时消费数量 */
+    public $qos = 1;
+    /** 开启多少个消费者 */
+    public $numprocs = 1;
+    /** 当前配置的唯一标志 */
     public $program;
-    // public $command;
-    public $duplicate;
-    // public $directory;
+    /** 执行的命令 */
+    public $command;
+    /** 开启消费者副本的数量 */
+    public $duplicate = 1;
+    /** 当前工作的目录 */
+    public $directory;
+
+    /** 通过 $qos $queueName $duplicate 生成的 $queue */
     public $queue;
-    public $script;
-    public $request;
+    /** 程序执行日志记录 */
+    public $logfile = '';
 
     public function getQueues()
     {
         $array = [];
-        if (empty($this->program) || empty($this->queueName) || empty($this->script)) {
+        if (empty($this->program) || empty($this->queueName) || empty($this->command)) {
             AmqpIniHelper::addLog(sprintf(
-                "program:%s, queueName:%s script:%s",
+                "program:%s, queueName:%s command:%s",
                 $this->program,
                 $this->queueName,
-                $this->script
+                $this->command
             ), Logger::ERROR);
             return $array;
         }

@@ -16,6 +16,8 @@ pidfile = /usr/local/var/run/amqp_master.pid
 ; 执行ExecDispatcher.php脚本的命令
 command = /usr/local/php5/bin/php
 ; \pzr\amqp\cli\Server 启动unix连接的本地文件地址
+; \pzr\amqp\cli\Server 启动unix连接的本地文件地址
+listen = /usr/local/var/run/amqp_consumer_serve.sock
 unix = /usr/local/var/run/amqp_consumer_serve.sock
 ; 进程文件管理路径
 process_file = ./process_manager.ini

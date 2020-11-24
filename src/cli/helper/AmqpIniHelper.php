@@ -169,9 +169,6 @@ class AmqpIniHelper
         if (empty($config['program']) || !preg_match('/\w+/', $config['program'])) {
             static::exit(sprintf("invalid value of program :%s in file:%s", $config['program'], $filepath));
         }
-        if (empty($config['script']) || !is_file($config['script'])) {
-            static::exit(sprintf("[consumer] %s : no such script in file:%s", $config['script'], $filepath));
-        }
         if (empty($config['queueName'])) {
             static::exit(sprintf("invalid value of queueName :%s in file:%s", $config['queueName'], $filepath));
         }
