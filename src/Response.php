@@ -11,22 +11,20 @@ class Response extends BaseObject
 
     public static $error = [
         0 => 'SUCCESS',
-        1 => 'object|action is empty',
-        2 => 'object instance error',
-        3 => 'action is\'t exist',
-        4 => 'object is\'t exist',
+        1 => 'object|action is empty：',
+        2 => 'object instance error：',
+        3 => 'action is\'t exist：',
+        4 => 'object is\'t exist：',
         10 => 'other uncatch error',
     ];
 
 
     public static function setError($errno, $msg = '')
     {
-        $msg = empty($msg) && isset(self::$error[$errno])
-            ? self::$error[$errno]
-            : 'unkonw error';
+        $msg = self::$error[$errno] . $msg;
         return [
             'rpc_errno' => $errno,
-            'msg' => $msg
+            'rpc_msg' => $msg
         ];
     }
 

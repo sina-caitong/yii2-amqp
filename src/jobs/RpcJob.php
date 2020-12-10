@@ -3,6 +3,7 @@
 namespace pzr\amqp\jobs;
 
 use pzr\amqp\Response;
+use ReflectionClass;
 use ReflectionMethod;
 
 /**
@@ -20,6 +21,8 @@ class RpcJob extends AmqpJob
     public $action;
     /** 请求法的参数 */
     public $params;
+    /** 父类构造方法参数 */
+    public $args = array();
 
     public function execute()
     {
@@ -27,15 +30,21 @@ class RpcJob extends AmqpJob
             return $this->debug ? Response::setError(1) : false;
         }
         if (!class_exists($this->object)) {
-            return $this->debug ? Response::setError(4) : false;
+            return $this->debug ? Response::setError(4, $this->object) : false;
         }
         $reflect = new ReflectionMethod($this->object, $this->action);
         $flag = $reflect->isStatic();
         if ($flag) {
             return $reflect->invokeArgs(null, $this->params);
         }
-        $obj = $this->object;
-        $obj = new $obj();
+
+        $class = new ReflectionClass($this->object);
+        if (!is_array($this->args)) {
+            $obj = $class->newInstance($this->args);
+        } else {
+            $obj = $class->newInstanceArgs($this->args);
+        }
+        
         if (!is_object($obj)) return Response::setError(2);
         if (!method_exists($obj, $this->action)) {
             return $this->debug ? Response::setError(3) : false;
