@@ -8,7 +8,7 @@ class Obj
 
     protected $name;
 
-    public function __construct($name)
+    public function __construct($name='pzr')
     {
         $this->name = $name;
     }

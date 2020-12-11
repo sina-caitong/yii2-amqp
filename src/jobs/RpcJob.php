@@ -4,6 +4,7 @@ namespace pzr\amqp\jobs;
 
 use pzr\amqp\Response;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionMethod;
 
 /**
@@ -38,11 +39,17 @@ class RpcJob extends AmqpJob
             return $reflect->invokeArgs(null, $this->params);
         }
 
-        $class = new ReflectionClass($this->object);
-        if (!is_array($this->args)) {
-            $obj = $class->newInstance($this->args);
-        } else {
-            $obj = $class->newInstanceArgs($this->args);
+        try {
+            $class = new ReflectionClass($this->object);
+            if (empty($this->args)) {
+                $obj = $class->newInstance();
+            } elseif (!is_array($this->args)) {
+                $obj = $class->newInstance($this->args);
+            } else {
+                $obj = $class->newInstanceArgs($this->args);
+            }
+        } catch(ReflectionException $e) {
+            return Response::setError(5, $e->getMessage());
         }
         
         if (!is_object($obj)) return Response::setError(2);

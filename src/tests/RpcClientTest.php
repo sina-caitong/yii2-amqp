@@ -17,15 +17,15 @@ $jobs[] = new RpcJob([
     'action' => 'test',
     'params' => [],
     'debug' => true,
-    'args' => 'pzr'
+    'args' => ''
 ]);
 
 $jobs[] = new RpcJob([
-    'object' => 'pzr\amqp\tests\Obj',
+    'object' => 'pzr\amqp\tests\Obj2',
     'action' => 'staticTest',
     'params' => [],
     'debug' => true,
-    'args' => ['zy']
+    'args' => ''
 ]);
 
 $response = $yii->request([

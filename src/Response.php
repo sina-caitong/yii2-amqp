@@ -15,6 +15,7 @@ class Response extends BaseObject
         2 => 'object instance error：',
         3 => 'action is\'t exist：',
         4 => 'object is\'t exist：',
+        5 => '抛出异常：',
         10 => 'other uncatch error',
     ];
 
