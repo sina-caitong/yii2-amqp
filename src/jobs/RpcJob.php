@@ -2,6 +2,7 @@
 
 namespace pzr\amqp\jobs;
 
+use Exception;
 use pzr\amqp\Response;
 use ReflectionClass;
 use ReflectionException;
@@ -30,17 +31,17 @@ class RpcJob extends AmqpJob
         if (empty($this->object) || empty($this->action)) {
             return $this->debug ? Response::setError(1) : false;
         }
-        if (!class_exists($this->object)) {
-            return $this->debug ? Response::setError(4, $this->object) : false;
-        }
-        $reflect = new ReflectionMethod($this->object, $this->action);
-        $flag = $reflect->isStatic();
-        if ($flag) {
-            return $reflect->invokeArgs(null, $this->params);
-        }
 
         try {
             $class = new ReflectionClass($this->object);
+            if (!$class->hasMethod($this->action)) {
+                return $this->debug ? Response::setError(3) : false;
+            }
+            $reflect = new ReflectionMethod($this->object, $this->action);
+            $flag = $reflect->isStatic();
+            if ($flag) {
+                return $reflect->invokeArgs(null, $this->params);
+            }
             if (empty($this->args)) {
                 $obj = $class->newInstance();
             } elseif (!is_array($this->args)) {
@@ -48,13 +49,9 @@ class RpcJob extends AmqpJob
             } else {
                 $obj = $class->newInstanceArgs($this->args);
             }
-        } catch(ReflectionException $e) {
-            return Response::setError(5, $e->getMessage());
-        }
-        
-        if (!is_object($obj)) return Response::setError(2);
-        if (!method_exists($obj, $this->action)) {
-            return $this->debug ? Response::setError(3) : false;
+            if (!is_object($obj)) return $this->debug ? Response::setError(2) : false;
+        } catch (ReflectionException $e) {
+            return Response::setError(5, $e->__toString());
         }
         return call_user_func_array([$obj, $this->action], $this->params);
     }
