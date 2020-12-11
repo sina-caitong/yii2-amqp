@@ -24,14 +24,14 @@
     "require": {
         "php":">=7.0.0",
         "php-amqplib/php-amqplib": "^2.12",
-        "yiisoft/yii2": "2.0.39.3",
+        "yiisoft/yii2": "^2.0.3",
         "monolog/monolog": "^2.1",
         "pda/pheanstalk": "^4.0",
         "symfony/http-client": "^5.1",
         "yiisoft/yii2-debug": "^2.1",
         "yiisoft/yii2-gii": "^2.2",
         "yiisoft/yii2-bootstrap": "^2.0",
-        "yidas/yii2-bower-asset": "2.0.13.1",
+        "yidas/yii2-bower-asset": "^2.0.13.1",
         "fxp/composer-asset-plugin": "^1.4"
     }
 }
