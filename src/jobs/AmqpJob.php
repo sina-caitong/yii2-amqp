@@ -29,7 +29,13 @@ class AmqpJob extends BaseObject implements JobInterface
      */
     private $priority = 0;
 
-    public function init() {
+    /** @var Logger */
+    protected $logger;
+    public $access_log = '';
+    public $error_log = '';
+
+    public function init()
+    {
         $this->getUuid() or $this->setUuid(uniqid(true));
         parent::init();
     }
@@ -53,7 +59,7 @@ class AmqpJob extends BaseObject implements JobInterface
 
     /**
      * Get the value of uuid
-     */ 
+     */
     public function getUuid()
     {
         return $this->uuid;
@@ -63,7 +69,7 @@ class AmqpJob extends BaseObject implements JobInterface
      * Set the value of uuid
      *
      * @return  self
-     */ 
+     */
     public function setUuid($uuid)
     {
         $this->uuid = $uuid;
