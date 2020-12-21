@@ -32,6 +32,20 @@ class Logger
 
     public function addLog($message, $level = BaseLogger::INFO)
     {
+        if (is_array($message)) {
+            $str = PHP_EOL . '';
+            foreach ($message as $k => $v) {
+                if (empty($v)) continue;
+                if (is_string($v)) {
+                    $str .= "$k=>$v" . PHP_EOL;
+                    continue;
+                }
+                foreach ($v as $kk => $vv) {
+                    $str .= "$k.$kk=>$vv" . PHP_EOL;
+                }
+            }
+            $message = $str;
+        }
         $this->logger->addRecord($level, $message);
     }
 }
