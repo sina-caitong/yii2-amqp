@@ -16,9 +16,6 @@ class FileHelper
 
     public static function write($file, string $data, $mode = self::FILE_NORMAL)
     {
-        if (!is_file($file)) {
-            AmqpIniHelper::exit($file . ' is not a file', Logger::ERROR);
-        }
         $fd = fopen($file, $mode);
         if (!is_resource($fd)) {
             umask(022);
