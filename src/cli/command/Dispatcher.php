@@ -196,43 +196,18 @@ class Dispatcher
     {
         $this->handler->addQueue(getmypid(), posix_getppid(), $c->queue, $c->program);
         @cli_set_process_title('AMQP worker consmer');
-        $command = str_replace(['{php}', '{directory}', '{queueName}', '{qos}'], [
+        $command = str_replace(['{php}', '{queueName}', '{qos}'], [
             AmqpIniHelper::getCommand(),
-            $c->directory,
             $c->queue,
             $c->qos
         ], $c->command);
-        preg_match_all('/(\S+)/', $command, $matches);
-        $args = $matches[0];
-        AmqpIniHelper::addLog($command);
-        $sh = array_shift($args);
-        $flag = pcntl_exec($sh, $args);
-        if ($flag === false) {
-            exit(1);
+        $descriptorspec = [
+            2 => ['file', $c->logfile, 'a'],
+        ];
+        $process = proc_open($command, $descriptorspec, $pipes, $c->directory);
+        if ($process) {
+            $ret = proc_close($process);
         }
         exit(0);
-
-        // $command = str_replace(['{php}', '{queueName}', '{qos}'] ,[
-        //     AmqpIniHelper::getCommand(),
-        //     $c->queueName,
-        //     $c->qos
-        // ], $c->command);
-        // $descriptorspec = array(
-        //     0 => array("pipe", "r"),  // 标准输入，子进程从此管道中读取数据
-        //     1 => array("pipe", "w"),  // 标准输出，子进程向此管道中写入数据
-        //     2 => array("file", $c->logfile, "a") // 标准错误，写入到一个文件
-        //  );
-        // $process = proc_open($command, $descriptorspec, $pipe, $c->directory);
-        // AmqpIniHelper::addLog(sprintf(
-        //     "cd %s && %s, result:%s",
-        //     $c->directory,
-        //     $command,
-        //     intval($process)
-        // ));
-        // // return $process;
-        // if ($process === false) {
-        //     exit(1);
-        // }
-        // exit(0);
     }
 }
