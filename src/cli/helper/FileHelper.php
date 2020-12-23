@@ -17,15 +17,6 @@ class FileHelper
     public static function write($file, string $data, $mode = self::FILE_NORMAL)
     {
         $fd = fopen($file, $mode);
-        if (!is_resource($fd)) {
-            umask(022);
-            $flag = @chmod($file, 0777);
-            if ($flag === false) {
-                AmqpIniHelper::exit($file . ' chmod 0755 failed', Logger::ERROR);
-            }
-            $fd = fopen($file, $mode);
-            is_resource($fd) or AmqpIniHelper::exit($file . ' fopen failed', Logger::ERROR);
-        }
         $size = fwrite($fd, $data, strlen($data));
         fclose($fd);
         return $size;

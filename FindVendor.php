@@ -19,14 +19,6 @@ $dirs = [
 foreach ($dirs as $dir) {
     if (is_dir($dir)) {
         $basePath = dirname($dir);
-        $content = <<<STR
-<?php
-
-// vendor的绝对路径
-return '$basePath';
-STR;
-        // file_put_contents($vendor_path, $content);
-        FileHelper::write($vendor_path, $content, FileHelper::FILE_NORMAL);
         return $basePath;
     }
 }
