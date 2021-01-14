@@ -164,7 +164,7 @@ class AmqpForm extends Model
         foreach ($array as $v) {
             list($pid, $ppid, $queueName, $program) = $v;
             $isAlive = $domainCheck[$ppid] = isset($domainCheck[$ppid]) ? $domainCheck[$ppid] : AmqpIniHelper::checkProcessAlive($ppid);
-            $ppid = $isAlive ? $ppid : 1;
+            // $ppid = $isAlive ? $ppid : 1;
             $str = substr($queueName, -2);
             $queue = preg_match('/^_\d$/', $str) ? substr($queueName, 0, -2) : $queueName;
             isset($stat[$queue]) ? $stat[$queue]++ : $stat[$queue] = 1;

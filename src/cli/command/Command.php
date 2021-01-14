@@ -2,6 +2,7 @@
 
 namespace pzr\amqp\cli\command;
 
+use Exception;
 use Monolog\Logger as BaseLogger;
 use pzr\amqp\cli\communication\CommunFactory;
 use pzr\amqp\cli\helper\AmqpIniHelper;
@@ -66,7 +67,12 @@ class Command extends BaseCommand implements CommandInterface
             // pcntl_exec(AmqpIniHelper::getCommand(), [$path])
             //     or $this->logger->addLog('shell exec error' ,BaseLogger::ERROR);
             // shell_exec($cmd); //生成的子进程ID无法捕捉
-            (new Dispatcher())->run();
+            try {
+                (new Dispatcher())->run();
+            } catch(Exception $e) {
+                AmqpIniHelper::exit($e->__toString());
+            }
+            
             exit(0);
         }
         while (!$this->end) {

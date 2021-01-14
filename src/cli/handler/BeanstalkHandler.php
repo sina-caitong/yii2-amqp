@@ -33,7 +33,7 @@ class BeanstalkHandler extends BaseHandler
         }
         $job = [self::EVENT_ADD_QUEUE => [$pid, $ppid, $queue, $program]];
         try {
-            $this->logger->addLog(sprintf("[%s] %s=%s,%s", self::EVENT_ADD_QUEUE, $pid, $queue, $program));
+            $this->logger->addLog(sprintf("[%s] %s=%s,%s,%s", self::EVENT_ADD_QUEUE, $pid, $ppid, $queue, $program));
             $this->talker->useTube(self::QUEUE)->put(json_encode($job));
         } catch (Exception $e) {
         }

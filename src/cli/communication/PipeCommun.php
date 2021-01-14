@@ -19,12 +19,10 @@ class PipeCommun extends BaseCommun
 
     public function open()
     {
-       
     }
 
     public function close()
     {
-        
     }
 
     public function read()
@@ -75,7 +73,8 @@ class PipeCommun extends BaseCommun
 
     public function flush()
     {
-        FileHelper::write($this->pipe_file, '') or 
-            AmqpIniHelper::addLog('flush file error:' . $this->pipe_file, BaseLogger::ERROR);
+        // FileHelper::write($this->pipe_file, '') or
+        //     AmqpIniHelper::addLog('flush file error:' . $this->pipe_file, BaseLogger::ERROR);
+        FileHelper::write($this->pipe_file, '');
     }
 }

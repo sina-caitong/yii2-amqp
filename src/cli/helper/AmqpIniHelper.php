@@ -38,7 +38,7 @@ class AmqpIniHelper
     public static $logger = null;
 
     /** @var string 默认读取的日志级别 */
-    const DEFAULT_LOGGER_LEVEL = 'info,error,warning';
+    const DEFAULT_LOGGER_LEVEL = 'info,error,warning,debug';
 
 
     public static function parseIni()
@@ -179,14 +179,15 @@ class AmqpIniHelper
             static::exit($e->getMessage());
         }
 
-        $consumers = array();
+        // $consumers = array();
         $queues = $consumer->getQueues();
-        foreach ($queues as $c) {
-            $isExist = ProcessHelper::isProcessExit($config['queueName'], $config['program']);
-            if ($isExist) continue;
-            $consumers[] = $c;
-        }
-        return $consumers;
+        // foreach ($queues as $c) {
+        //     $isExist = ProcessHelper::isProcessExit($config['queueName'], $config['program']);
+        //     if ($isExist) continue;
+        //     $consumers[] = $c;
+        // }
+        // return $consumers;
+        return $queues;
     }
 
     public static function getDefaultLogger()
@@ -302,7 +303,7 @@ class AmqpIniHelper
     public static function addLog($msg, $level = BaseLogger::INFO)
     {
         if (!static::$logger)
-            static::$logger = new Logger(DEFAULT_ACCESS_LOG, DEFAULT_ERROR_LOG);
+            static::$logger = new Logger(DEFAULT_ACCESS_LOG, DEFAULT_ERROR_LOG, self::DEFAULT_LOGGER_LEVEL);
         static::$logger->addLog($msg, $level);
     }
 

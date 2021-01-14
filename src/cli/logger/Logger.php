@@ -35,7 +35,7 @@ class Logger
         if (is_array($message)) {
             $str = PHP_EOL . '';
             foreach ($message as $k => $v) {
-                if (empty($v)) continue;
+                if (empty($v) && empty($k)) continue;
                 if (is_string($v)) {
                     $str .= "$k=>$v" . PHP_EOL;
                     continue;

@@ -77,6 +77,8 @@ class AmqpController extends Controller
     {
         $this->auth();
         $model = new AmqpForm();
+        // echo '<pre>';
+        // print_r($_SERVER); die;
         return $this->render('/amqp/index', [
             'model' => $model
         ]);

@@ -27,6 +27,29 @@ class Consumer extends BaseObject
     public $queue;
     /** 程序执行日志记录 */
     public $logfile = '';
+    /** 消费进程的唯一ID */
+    public $uniqid;
+    /** 进程IDpid */
+    public $pid;
+    /** 进程状态 */
+    public $state = self::NOMINAL;
+    /** 自启动 */
+    public $auto_restart = false;
+
+    public $process;
+    /** 启动时间 */
+    public $uptime;
+
+    const RUNNING = 'running';
+    const STOP = 'stoped';
+    const NOMINAL = 'nominal';
+    const RESTART = 'restart';
+    const STOPING = 'stoping';
+    const STARTING = 'stating';
+    const ERROR = 'error';
+    const BLOCKED = 'blocked';
+    const EXITED = 'exited';
+    const FATEL = 'fatel';
 
     public function getQueues()
     {
@@ -41,15 +64,23 @@ class Consumer extends BaseObject
             return $array;
         }
         $duplicate = $this->duplicate > 1 ? $this->duplicate : 1;
-        $numprocs = $this->numprocs >= 1 ? $this->numprocs : 1;
+        $numprocs = $this->numprocs >= 0 ? $this->numprocs : 1;
         $queue = $this->queueName;
+        $command = $this->command;
         while ($numprocs--) {
             for ($i = 0; $i < $duplicate; $i++) {
                 $queueName = $this->duplicate > 1 ? $queue . '_' . $i : $queue;
                 $this->queue = $queueName;
                 $this->numprocs = 1;
                 $this->duplicate = 1;
-                $array[] = $this;
+                $uniqid = uniqid();
+                $this->uniqid = $uniqid;
+                $this->command = str_replace(['{php}', '{queueName}', '{qos}'], [
+                    AmqpIniHelper::getCommand(),
+                    $this->queue,
+                    $this->qos
+                ], $command);
+                $array[$uniqid] = clone $this;
             }
         }
         return $array;
