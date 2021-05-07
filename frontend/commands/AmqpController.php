@@ -5,6 +5,7 @@ namespace app\commands;
 use app\models\CountJob;
 use app\models\RequestJob;
 use pzr\amqp\AmqpBase;
+use pzr\amqp\event\ExecEvent;
 use pzr\amqp\event\PushEvent;
 use pzr\amqp\jobs\RpcJob;
 use Yii;
@@ -23,13 +24,14 @@ class AmqpController extends Controller
      */
     public function actionConsumer($queueName, $qos=1, $consumerTag='')
     {
-        /*Yii::$app->consumer->on(AmqpBase::EVENT_BEFORE_EXEC, function(ExecEvent $event){
+        Yii::$app->consumer->on(AmqpBase::EVENT_BEFORE_EXEC, function(ExecEvent $event){
             // 消费者准备消费
+            
         });
 
         Yii::$app->consumer->on(AmqpBase::EVENT_AFTER_EXEC, function(ExecEvent $event){
             // 消费者准备消费
-        });*/
+        });
 
         Yii::$app->consumer->consume($queueName, $qos, $consumerTag);
     }

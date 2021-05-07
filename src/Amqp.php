@@ -126,9 +126,11 @@ class Amqp extends AmqpBase
     /**
      * @inheritDoc
      */
-    public function push($job)
+    public function push($job, $routingKey='')
     {
-        $routingKey = $this->duplicater->getRoutingKey($this->routingKey, $this->duplicate);
+        if(empty($routingKey)) {
+            $routingKey = $this->duplicater->getRoutingKey($this->routingKey, $this->duplicate);
+        }
         return parent::push($job, $routingKey);
     }
 

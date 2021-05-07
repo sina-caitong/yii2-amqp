@@ -14,6 +14,7 @@ use pzr\amqp\event\PushEvent;
 use pzr\amqp\exception\InvalidArgumentException;
 use pzr\amqp\exception\MissPropertyException;
 use pzr\amqp\exception\UnknowException;
+use pzr\amqp\jobs\AmqpJob;
 use pzr\amqp\QueueInterface;
 use pzr\amqp\serializers\SerializerInterface;
 use pzr\amqp\serializers\PhpSerializer;
@@ -200,17 +201,17 @@ class AmqpBase extends Component
      * @param string $routingKey
      * @return void
      */
-    public function push($job)
+    public function push($job, $routingKey)
     {
         $exchangeName = $this->exchangeName;
         $event = new PushEvent([
             'job' => $job,
             'exchangeName' => $exchangeName,
-            'routingKey' => $this->routingKey,
+            'routingKey' => $routingKey,
         ]);
 
         $this->trigger(self::EVENT_BEFORE_PUSH, $event);
-        $id = $this->pushMessage($event->job, $exchangeName, $this->routingKey, $event->noWait);
+        $id = $this->pushMessage($event->job, $exchangeName, $routingKey, $event->noWait);
         $event->id = $id;
 
         $this->trigger(self::EVENT_AFTER_PUSH, $event);

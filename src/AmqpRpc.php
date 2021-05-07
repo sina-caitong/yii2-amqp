@@ -33,7 +33,7 @@ class AmqpRpc extends Amqp
      * @param AmqpJob $job 
      * @return void
      */
-    public function push($job)
+    public function push($job, $routingKey='')
     {
         $this->open();
         $this->trigger(self::EVENT_BEFORE_PUSH, new PushEvent(['job' => $job]));
