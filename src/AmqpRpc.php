@@ -208,17 +208,17 @@ class AmqpRpc extends Amqp
         );
 
         // amqplib 1.2版本使用
-        // $payload->getChannel()->basic_publish(
-        //     $message,
-        //     '',
-        //     $payload->get('reply_to')
-        // );
-
-        $payload->delivery_info['channel']->basic_publish(
+        $payload->getChannel()->basic_publish(
             $message,
             '',
             $payload->get('reply_to')
         );
+
+        // $payload->delivery_info['channel']->basic_publish(
+        //     $message,
+        //     '',
+        //     $payload->get('reply_to')
+        // );
     }
 
     /**
