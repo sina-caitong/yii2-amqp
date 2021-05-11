@@ -33,6 +33,13 @@ class ExecEvent extends Event
      */
     public $result;
 
-    public $error;
+    public $error = null;
+
+    /**
+     * 消息体
+     *
+     * @var AMQPMessage
+     */
+    public $payload;
 
 }

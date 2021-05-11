@@ -362,6 +362,8 @@ class AmqpBase extends Component
         }
 
         $event = new ExecEvent(['job' => $job]);
+        // 消息体给event
+        $event->payload = $payload;
         $this->trigger(self::EVENT_BEFORE_EXEC, $event);
         try {
             $event->result = $event->job->execute();
