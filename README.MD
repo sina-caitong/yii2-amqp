@@ -40,6 +40,9 @@ return array(
         'port' => 5672,
         'user' => 'guest',
         'password' => 'guest',
+        // 'ackPolicy' => [
+        //     'component' => 'PolicyAckRetryCount',  // 指定使用重试次数计次ACK策略, 如不指定, 会以AmqpBase中ackPolicy属性默认指定
+        // ]
     ],
     /** 普通队列定义 */
     'easyQueue' => [
@@ -316,3 +319,49 @@ Yii::$app->easyQueue->on(AmqpBase::EVENT_BEFORE_PUSH, function(PushEvent $event)
     Yii::$app->easyQueue->getApi()->setPolicy();
 });
 ```
+
+
+
+<hr>
+
+### AMQP ACK Policy
+目前实现了3种ACK策略，它们都继承于AckPolicyInterface：
+
+| 策略 | 名称 | 说明 |
+| ------ | ------ | ------ |
+| PolicyAckRetryCount | 重试次数计数策略 | 会对当前任务的失败次数作计数统计，当失败次数超过一定数值时，nack放弃处理 |
+| PolicyAckNormal  | 普通ACK策略 | 当前任务处理失败时，默认requeue |
+| PolicyNoAck   | 无需ACK策略 | 无需ACK |
+
+
+3种策略均以组件的形式配置于yii/config/amqp.php，并作为组件注册到console.php中
+```php
+// ACK Policy
+'PolicyAckRetryCount' => [
+    'class' => \pzr\amqp\ack\PolicyAckRetryCount::class,
+    'retryLimit' => 5       // 可指定属性覆盖
+],
+'PolicyAckNormal' => [
+    'class' => \pzr\amqp\ack\PolicyAckNormal::class,
+],
+'PolicyNoAck' => [
+    'class' => \pzr\amqp\ack\PolicyNoAck::class,
+],
+```
+
+ACK策略一般配置在消费者中，如不指定，以AmqpBase中ackPolicy属性的默认指定为准。
+```php
+/** 普通消费者 */
+'consumer' => [
+    // 'class' =>  \pzr\amqp\Amqp::class,
+    'class' =>  \pzr\amqp\AmqpBase::class,
+    'host' => '127.0.0.1',
+    'port' => 5672,
+    'user' => 'guest',
+    'password' => 'guest',
+    // 'ackPolicy' => [
+    //     'component' => 'PolicyAckRetryCount',  // 指定使用重试次数计次ACK策略, 如不指定, 会以AmqpBase中ackPolicy属性默认指定
+    // ]
+],
+```
+<hr>

@@ -6,6 +6,10 @@ use Exception;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
+use pzr\amqp\ack\AckPolicyInterface;
+use pzr\amqp\ack\PolicyAckNormal;
+use pzr\amqp\ack\PolicyAckRetryCount;
+use pzr\amqp\ack\PolicyNoAck;
 use pzr\amqp\api\AmqpApi;
 use pzr\amqp\api\ApiInterface;
 use pzr\amqp\api\Policy;
@@ -18,6 +22,7 @@ use pzr\amqp\jobs\AmqpJob;
 use pzr\amqp\QueueInterface;
 use pzr\amqp\serializers\SerializerInterface;
 use pzr\amqp\serializers\PhpSerializer;
+use Yii;
 use yii\base\Component;
 use yii\base\Event;
 use yii\base\Application as BaseApp;
@@ -44,6 +49,9 @@ class AmqpBase extends Component
 
     /** @var SerializerInterface|array */
     public $serializer = PhpSerializer::class;
+
+    /** @var AckPolicyInterface|array */
+    protected $ackPolicy = PolicyAckRetryCount::class;
 
     /** @var int 定义队列的优先级 */
     public $priority;
@@ -93,6 +101,7 @@ class AmqpBase extends Component
     {
         parent::init();
         $this->serializer = Instance::ensure($this->serializer, SerializerInterface::class);
+        $this->ackPolicy = Instance::ensure($this->ackPolicy, AckPolicyInterface::class);
         Event::on(BaseApp::class, BaseApp::EVENT_AFTER_REQUEST, function () {
             $this->close();
         });
@@ -320,11 +329,12 @@ class AmqpBase extends Component
      * @param integer $qos              //每个队列最多未被消费的条数
      * @param string $consumerTag       //消费者的标签
      */
-    public function consume($queueName, $qos = 1, $consumerTag = '', $noAck = false)
+    public function consume($queueName, $qos = 1, $consumerTag = '')
     {
         $this->open();
-        $callback = function (AMQPMessage $payload) use ($noAck) {
-            $this->handleMessage($payload, $noAck);
+        $noAck = $this->ackPolicy->noAck();
+        $callback = function (AMQPMessage $payload) {
+            $this->handleMessage($payload);
         };
 
         /*
@@ -351,15 +361,17 @@ class AmqpBase extends Component
      * @param AMQPMessage $payload
      * @return ExecEvent
      */
-    public function handleMessage(AMQPMessage $payload, $noAck)
+    public function handleMessage(AMQPMessage $payload)
     {
         $job = $this->serializer->unserialize($payload->getBody());
         if (!($job instanceof AmqpJob)) {
             // amqplib 1.2用法
+            $noAck = $this->ackPolicy->noAck();
             $noAck ?: $payload->nack(false);
             // $noAck ?: $payload->delivery_info['channel']->nack($payload->delivery_info['consumer_tag'], true);
             return false;
         }
+
 
         $event = new ExecEvent(['job' => $job]);
         // 消息体给event
@@ -368,16 +380,22 @@ class AmqpBase extends Component
         try {
             $event->result = $event->job->execute();
             if ($event->result !== false) {
-                $noAck ?: $payload->ack(true);
+                $this->ackPolicy->handleSucc( $payload, $event );
+                // $noAck ?: $payload->ack(true);
                 // $noAck ?: $payload->delivery_info['channel']->ack($payload->delivery_info['consumer_tag'], true);
             } else {
-                $noAck ?: $payload->nack(true, true);
+                $this->ackPolicy->handleFail( $payload, $event );
+                // $noAck ?: $payload->nack(true, true);
                 // $noAck ?: $payload->delivery_info['channel']->nack($payload->delivery_info['consumer_tag'], true);
             }
         } catch (\Exception $error) {
             $event->error = $error;
+            $this->ackPolicy->handleError( $payload, $event );
+            // $noAck ?: $payload->nack(true, true);
         } catch (\Throwable $error) {
             $event->error = $error;
+            $this->ackPolicy->handleError( $payload, $event );
+            // $noAck ?: $payload->nack(true, true);
         }
         $this->trigger(self::EVENT_AFTER_EXEC, $event);
         return $event;
@@ -507,6 +525,34 @@ class AmqpBase extends Component
             'user' => $this->user,
             'password' => $this->password,
         ]);
+    }
+
+    public function setAckPolicy( $config ){
+
+        // 直接用组件
+        if (isset($config['component']) && !empty($config['component'])) {
+            $component = $config['component'];
+            $this->ackPolicy = Instance::ensure($component);
+            return;
+        }
+
+        // 需要配置class
+        // if (empty($config['class'])) {
+        //     return false;
+        // }
+        // $class = $config['class'];
+        // unset($config['class']);
+
+        // $ackPolicy = new $class( $config );
+        // if (!($ackPolicy instanceof AckPolicyInterface)) {
+        //     throw new InvalidArgumentException('invalid object of: ackPolicy');
+        // }
+        // $this->ackPolicy = $ackPolicy;
+        // var_dump($this->ackPolicy);
+    }
+
+    public function getAckPolicy(){
+        return $this->ackPolicy;
     }
 
     /**
